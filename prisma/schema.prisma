@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  addresses Address[]
+  orders    Order[]
+  wishlist  WishlistItem[]
+  settings  CustomerSetting?
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  customerId String
+  label      String
+  recipient  String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  customerId String
+  productId  String
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, productId])
+  @@index([productId])
+}
+
+model CustomerSetting {
+  id                  String   @id @default(cuid())
+  customerId          String   @unique
+  marketingEmails     Boolean  @default(false)
+  orderUpdates        Boolean  @default(true)
+  whatsappUpdates     Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  customer            Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StoreSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  price       Int
+  category    String?
+  brand       String?
+  model       String?
+  stock       Int         @default(0)
+  isAvailable Boolean     @default(true)
+  isActive    Boolean     @default(true)
+  deletedAt   DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  OrderItem   OrderItem[]
+  wishlistItems WishlistItem[]
+}
+
+model MobileModel {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  brand     String
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  templates CoverTemplate[]
+}
+
+model CoverTemplate {
+  id            String         @id @default(cuid())
+  name          String
+  imageUrl      String?
+  price         Int            @default(199900)
+  isActive      Boolean        @default(true)
+  mobileModelId String?
+  createdAt     DateTime       @default(now())
+  mobileModel   MobileModel?   @relation(fields: [mobileModelId], references: [id])
+  designs       CustomDesign[]
+}
+
+model CustomDesign {
+  id                String         @id @default(cuid())
+  mobileModel       String
+  templateName      String
+  designJson        String
+  previewImage      String
+  coverColor        String         @default("White")
+  colorHex          String         @default("#ffffff")
+  selectedColorName String         @default("White")
+  textDetails       Json?
+  uploadedAssets    Json?
+  templateId        String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  template          CoverTemplate? @relation(fields: [templateId], references: [id])
+  orderItems        OrderItem[]
+}
+
+model Order {
+  id                  String          @id @default(cuid())
+  orderNumber         String          @unique
+  customerName        String
+  customerEmail       String
+  customerPhone       String
+  shippingAddress     String
+  city                String
+  deliveryLocation    String?
+  totalAmount         Int
+  status              OrderStatus     @default(PENDING)
+  paymentStatus       PaymentStatus   @default(UNPAID)
+  stripeSessionId     String?         @unique
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  courier             String?
+  trackingNumber      String?
+  courierLastSyncedAt DateTime?
+  customerId          String?
+  items               OrderItem[]
+  payment             Payment?
+  trackingHistory     TrackingEvent[]
+  customer            Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([customerId, createdAt])
+}
+
+model OrderItem {
+  id             String        @id @default(cuid())
+  orderId        String
+  productId      String?
+  customDesignId String?
+  productType    ProductType   @default(STANDARD)
+  quantity       Int
+  price          Int
+  customDesign   CustomDesign? @relation(fields: [customDesignId], references: [id])
+  order          Order         @relation(fields: [orderId], references: [id])
+  product        Product?      @relation(fields: [productId], references: [id])
+}
+
+model TrackingEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  location  String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique
+  method        String?
+  status        PaymentStatus @default(UNPAID)
+  transactionId String?
+  amount        Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  order         Order         @relation(fields: [orderId], references: [id])
+}
+
+model Complaint {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  orderNumber String?
+  message     String
+  channel     String   @default("whatsapp")
+  createdAt   DateTime @default(now())
+}
+
+enum ProductType {
+  STANDARD
+  CUSTOMIZED_COVER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  REFUNDED
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <rect width="800" height="1000" fill="#09051d"/>
+  <path d="M0 760 240 470l100 90 190-330 270 530v240H0Z" fill="#1a0b46"/><g stroke="#ff43d7" stroke-width="12" opacity=".9"><path d="M0 800 800 310M0 910 800 420M0 610 550 100"/></g><g stroke="#34f5ff" stroke-width="9"><path d="M0 860 800 510M90 100 780 650M310 0 800 370"/></g>
+  <rect x="70" y="80" width="660" height="840" rx="58" fill="none" stroke="#34f5ff" stroke-width="18"/><circle cx="150" cy="160" r="44" fill="#34f5ff"/><circle cx="150" cy="160" r="17" fill="#09051d"/>
+  <text x="400" y="710" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="62" font-weight="bold">NEON</text><text x="400" y="775" text-anchor="middle" fill="#ff43d7" font-family="Arial, sans-serif" font-size="34" letter-spacing="12">CITY</text>
+</svg>

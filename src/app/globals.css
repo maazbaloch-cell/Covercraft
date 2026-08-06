@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { background: #f7f7fb; color: #0f172a; min-height: 100vh; }
+  input, textarea, select { transition: border-color .18s ease, box-shadow .18s ease; }
+  input:focus, textarea:focus, select:focus { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px rgb(139 92 246 / .14); outline: none; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer components {
+  .design-studio > div:first-child { border-radius: 1.5rem; padding: 2rem; color: white; background: radial-gradient(circle at top right, rgb(139 92 246 / .65), transparent 36%), #0f172a; }
+  .design-studio > div:first-child p { color: #c4b5fd !important; }
+  .design-studio > div:first-child h1 { font-weight: 900; letter-spacing: -.04em; }
+  .design-studio section { border-color: #e2e8f0 !important; border-radius: 1.25rem !important; box-shadow: 0 8px 22px rgb(15 23 42 / .05); }
+  .design-studio aside { position: sticky; top: 5.5rem; }
+  .design-studio aside section h2 { font-weight: 800; color: #0f172a; }
+  .design-studio button { transition: transform .16s ease, box-shadow .16s ease, background-color .16s ease; }
+  .design-studio button:hover { transform: translateY(-1px); }
+  .design-studio aside > button { border-radius: .9rem !important; background: #0f172a !important; box-shadow: 0 10px 20px rgb(15 23 42 / .18); }
+  .design-studio select, .design-studio input:not([type="color"]), .design-studio textarea { border-color: #cbd5e1 !important; border-radius: .7rem !important; }
+  .design-studio canvas { filter: drop-shadow(0 16px 14px rgb(15 23 42 / .18)); }
+  .admin-dashboard > h1 { font-size: 2rem; font-weight: 900; letter-spacing: -.045em; color: #0f172a; }
+  .admin-dashboard > h1::before { content: "Operations center"; display: block; margin-bottom: .45rem; color: #7c3aed; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .admin-dashboard .bg-white { border-color: #e2e8f0 !important; border-radius: 1.25rem !important; box-shadow: 0 7px 18px rgb(15 23 42 / .04); }
+  .admin-dashboard > .grid > div { position: relative; overflow: hidden; border: 0 !important; background: #0f172a; color: white; }
+  .admin-dashboard > .grid > div:nth-child(2) { background: linear-gradient(135deg,#6d28d9,#4f46e5); }
+  .admin-dashboard > .grid > div p:first-child { color: #cbd5e1; }
+  .admin-dashboard button { border-radius: .65rem; font-weight: 700; transition: transform .16s ease, box-shadow .16s ease; }
+  .admin-dashboard button:hover { transform: translateY(-1px); }
+  .admin-dashboard input, .admin-dashboard select { border-color: #cbd5e1 !important; border-radius: .65rem !important; }
+  .admin-dashboard h2 { color: #0f172a; font-weight: 800; }
+  .premium-cart > h1 { font-weight: 900; letter-spacing: -.04em; color: #0f172a; }
+  .premium-cart > h1::before { content: "Checkout"; display: block; margin-bottom: .35rem; color: #7c3aed; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .premium-cart .bg-white { border-color: #e2e8f0 !important; border-radius: 1rem !important; box-shadow: 0 8px 20px rgb(15 23 42 / .05); }
+  .premium-cart input { border-color: #cbd5e1 !important; border-radius: .7rem !important; }
+  #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+  @media (min-width: 640px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+}
