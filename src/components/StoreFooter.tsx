@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const shopLinks = [["Shop covers", "/"], ["Customise a cover", "/customize-cover"], ["Track an order", "/track"]];
+const shopLinks = [["Shop covers", "/shop"], ["Customise a cover", "/customize-cover"], ["Track an order", "/track"]];
 const helpLinks = [["Support", "/complaint"], ["Your cart", "/cart"], ["Saved covers", "/wishlist"], ["Your account", "/account"]];
 
 export default function StoreFooter() {

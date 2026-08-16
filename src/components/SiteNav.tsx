@@ -9,7 +9,7 @@ import { EASE_OUT_EXPO } from "@/lib/motion";
 import AdminNav from "./AdminNav";
 
 const LINKS = [
-  { href: "/", label: "Shop" },
+  { href: "/shop", label: "Shop" },
   { href: "/customize-cover", label: "Customize" },
   { href: "/track", label: "Track Order" },
   { href: "/account", label: "Account" },

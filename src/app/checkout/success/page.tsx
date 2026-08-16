@@ -69,7 +69,7 @@ function SuccessContent() {
             Track your order →
           </Link>
         )}
-        <Link href="/" className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-slate-100">
+        <Link href="/shop" className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-slate-100">
           Continue shopping
         </Link>
       </motion.div>

@@ -117,7 +117,7 @@ export default function CartPage() {
           <h1 className="mt-6 text-2xl font-black tracking-tight text-slate-950">Your cart is empty</h1>
           <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">Looks like you haven&apos;t added anything yet. Explore the collection and find a cover worth showing off.</p>
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="mt-7">
-            <Link href="/" className="group inline-flex items-center rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700">
+            <Link href="/shop" className="group inline-flex items-center rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700">
               Browse covers<span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
             </Link>
           </motion.div>

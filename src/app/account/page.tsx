@@ -123,7 +123,7 @@ export default function AccountPage() {
         ) : (
           <p className="mt-5 text-center text-xs leading-5 text-slate-500">{mode === "signup" ? "Your account uses a secure, encrypted password." : "New to CoverCraft? "}<button type="button" onClick={() => switchMode(mode === "login" ? "signup" : "login")} className="font-bold text-violet-700">{mode === "login" ? "Create an account" : "Sign in instead"}</button></p>
         )}
-        <Link href="/" className="mt-5 block text-center text-sm font-bold text-violet-700">Continue shopping →</Link>
+        <Link href="/shop" className="mt-5 block text-center text-sm font-bold text-violet-700">Continue shopping →</Link>
       </div>
     </div>
   </div>;

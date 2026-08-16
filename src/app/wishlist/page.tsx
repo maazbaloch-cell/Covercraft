@@ -78,7 +78,7 @@ export default function WishlistPage() {
           <span className="text-5xl">♡</span>
           <h2 className="mt-4 text-xl font-black text-slate-950">No saved covers yet</h2>
           <p className="mt-2 max-w-sm text-sm text-slate-500">Tap the heart on any cover to save it here for later.</p>
-          <Link href="/" className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-violet-700">Browse the collection</Link>
+          <Link href="/shop" className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-violet-700">Browse the collection</Link>
         </motion.div>
       )}
 

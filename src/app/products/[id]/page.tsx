@@ -44,7 +44,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <nav className="mb-6 text-sm text-slate-500">
-        <a href="/" className="font-semibold text-violet-700 hover:underline">Shop</a>
+        <a href="/shop" className="font-semibold text-violet-700 hover:underline">Shop</a>
         <span className="mx-2">/</span>
         <span className="text-slate-700">{product.title}</span>
       </nav>

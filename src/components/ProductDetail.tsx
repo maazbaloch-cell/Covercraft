@@ -101,7 +101,7 @@ export default function ProductDetail(p: ProductDetailProps) {
           <p className="flex items-center gap-2"><span className="text-violet-700">✦</span> Premium, made-to-last quality</p>
         </div>
 
-        <Link href="/" className="mt-8 text-sm font-bold text-violet-700">← Back to all covers</Link>
+        <Link href="/shop" className="mt-8 text-sm font-bold text-violet-700">← Back to all covers</Link>
       </div>
     </div>
   );
