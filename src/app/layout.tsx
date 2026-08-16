@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import { fontVariables } from "../lib/fonts";
 import SiteNav from "../components/SiteNav";
 import MotionProvider from "../components/MotionProvider";
 import StoreFooter from "../components/StoreFooter";
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={fontVariables}>
       <body>
         <MotionProvider>
           <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/95 px-4 py-3 text-white shadow-lg backdrop-blur sm:px-6">
