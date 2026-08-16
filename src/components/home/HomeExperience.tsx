@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import type { CatalogProduct } from "@/components/ShopCatalog";
 import { resolveProductImage } from "@/lib/productImage";
 import ScrollStory from "./ScrollStory";
+import CoverWorlds from "./CoverWorlds";
 import {
   EASE_CINEMATIC,
   EASE_OUT_EXPO,
@@ -39,7 +40,7 @@ export default function HomeExperience({ featured }: { featured: CatalogProduct[
 
       <Hero cover={featured[0]} />
       <ScrollStory cover={featured[0]} />
-      <Worlds />
+      <CoverWorlds />
       {featured.length > 0 && <Featured products={featured} />}
       <Closing />
     </div>
@@ -166,50 +167,6 @@ function Hero({ cover }: { cover?: CatalogProduct }) {
         >
           ↓
         </motion.span>
-      </motion.div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Worlds — teaser for the three cover worlds (deepened in Phase 5).
- * ------------------------------------------------------------------ */
-const WORLDS = [
-  { key: "art", name: "Art", line: "Marble, florals & painterly gradients.", grad: "from-fuchsia-500/30 via-violet-600/20 to-transparent", ring: "group-hover:border-fuchsia-400/50" },
-  { key: "gaming", name: "Gaming", line: "Neon, cyber grids & bold energy.", grad: "from-cyan-400/30 via-sky-500/20 to-transparent", ring: "group-hover:border-cyan-300/50" },
-  { key: "sports", name: "Sports", line: "Motion, teams & the thrill of play.", grad: "from-emerald-400/30 via-teal-500/20 to-transparent", ring: "group-hover:border-emerald-300/50" },
-] as const;
-
-function Worlds() {
-  return (
-    <section className="relative mx-auto w-full max-w-[var(--cinema-max)] px-6 py-20 sm:py-28">
-      <SectionHeading eyebrow="Explore" title="Three worlds to get lost in" />
-      <motion.div
-        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="mt-12 grid gap-5 sm:grid-cols-3"
-      >
-        {WORLDS.map((w) => (
-          <motion.div key={w.key} variants={cinematicReveal}>
-            <Link
-              href="/shop"
-              className={`group relative flex h-64 flex-col justify-end overflow-hidden rounded-3xl border border-white/10 bg-ink-800/60 p-6 transition-colors duration-300 ${w.ring}`}
-            >
-              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-tr ${w.grad}`} />
-              <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/5 blur-2xl transition-transform duration-500 group-hover:scale-125" />
-              <div className="relative">
-                <h3 className="font-display text-3xl font-bold text-white">{w.name}</h3>
-                <p className="mt-2 text-sm text-slate-300">{w.line}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-accent-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                  Explore
-                  <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </span>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
       </motion.div>
     </section>
   );
