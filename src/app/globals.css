@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Scroll-reveal: elements start hidden, then <Reveal> swaps to .reveal-in when in view. */
+  .reveal-init { opacity: 0; transform: translateY(18px); }
+  .reveal-in { opacity: 1; transform: none; transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1); }
+  /* One-shot entrance animations for self-contained surfaces (confirmation cards, etc.). */
+  .animate-fade-up { animation: fade-up .5s cubic-bezier(.22,.61,.36,1) both; }
+  .animate-pop { animation: pop .45s cubic-bezier(.34,1.56,.64,1) both; }
+  .animate-fade-in { animation: fade-in .4s ease both; }
+}
+
+@keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { opacity: 0; transform: scale(.7); } 60% { transform: scale(1.06); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* Respect users who ask for less motion: neutralise animations/transitions and reveal everything up-front. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-init { opacity: 1 !important; transform: none !important; }
+}
+
+
 @layer base {
   html { scroll-behavior: smooth; }
   body { background: #f7f7fb; color: #0f172a; min-height: 100vh; }
@@ -36,8 +63,4 @@
   .premium-cart > h1::before { content: "Checkout"; display: block; margin-bottom: .35rem; color: #7c3aed; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
   .premium-cart .bg-white { border-color: #e2e8f0 !important; border-radius: 1rem !important; box-shadow: 0 8px 20px rgb(15 23 42 / .05); }
   .premium-cart input { border-color: #cbd5e1 !important; border-radius: .7rem !important; }
-  #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-  @media (min-width: 640px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (min-width: 1024px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @media (min-width: 1280px) { #catalogue > div > div.grid > div:last-child > div:first-child { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 }

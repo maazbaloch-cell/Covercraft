@@ -27,6 +27,14 @@ export const addressSchema = z.object({ label: text(40), recipient: text(100), p
 export const customerSettingsSchema = z.object({ marketingEmails: z.boolean(), orderUpdates: z.boolean(), whatsappUpdates: z.boolean() });
 export const newsletterSchema = z.object({ email: z.string().trim().email().max(254) });
 
+const code = z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code.");
+const emailField = z.string().trim().email().max(254);
+
+export const emailOnlySchema = z.object({ email: emailField });
+export const otpConfirmSchema = z.object({ code });
+export const checkoutOtpConfirmSchema = z.object({ email: emailField, code });
+export const passwordResetSchema = z.object({ email: emailField, code, newPassword: password });
+
 export const productUpdateSchema = z.object({
   title: text(160).optional(),
   description: z.string().trim().max(2_000).nullable().optional(),
