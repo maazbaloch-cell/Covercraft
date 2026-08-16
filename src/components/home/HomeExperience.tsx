@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import type { CatalogProduct } from "@/components/ShopCatalog";
 import { resolveProductImage } from "@/lib/productImage";
+import ScrollStory from "./ScrollStory";
 import {
   EASE_CINEMATIC,
   EASE_OUT_EXPO,
@@ -31,12 +32,13 @@ import {
  */
 export default function HomeExperience({ featured }: { featured: CatalogProduct[] }) {
   return (
-    <div className="cinematic-scene relative isolate overflow-hidden">
+    <div className="cinematic-scene relative isolate overflow-x-clip">
       {/* Ambient cinematic backdrop */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-aurora animate-aurora-drift" />
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.12] mix-blend-soft-light" />
 
       <Hero cover={featured[0]} />
+      <ScrollStory cover={featured[0]} />
       <Worlds />
       {featured.length > 0 && <Featured products={featured} />}
       <Closing />
