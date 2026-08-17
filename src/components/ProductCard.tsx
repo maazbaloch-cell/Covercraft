@@ -49,28 +49,31 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       viewport={viewportOnce}
       transition={{ duration: DUR.section, ease: EASE_OUT_EXPO, delay: (index % 5) * 0.05 }}
       whileHover={{ y: -6 }}
-      className="group relative flex flex-col overflow-hidden rounded-[1.15rem] border border-slate-200/90 bg-white shadow-[0_3px_14px_rgb(15_23_42_/_0.05)] transition-[box-shadow,border-color] duration-300 hover:border-violet-200 hover:shadow-[0_14px_28px_rgb(15_23_42_/_0.12)]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_2px_10px_rgb(15_23_42_/_0.04)] transition-[box-shadow,border-color] duration-300 hover:border-accent-300 hover:shadow-[0_22px_48px_-16px_rgb(109_40_217_/_0.30)]"
     >
-      <div className="relative aspect-[4/4.35] overflow-hidden bg-slate-100">
+      <div className="relative aspect-[4/4.35] overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200/60">
         <Link href={href} aria-label={`View ${title}`}>
-          <Image src={displayImageUrl} alt={title} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" className="object-cover transition duration-500 ease-out group-hover:scale-[1.05]" onError={() => setImageFailed(true)} />
+          <Image src={displayImageUrl} alt={title} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" className={`object-cover transition duration-[650ms] ease-out group-hover:scale-[1.06] ${isOutOfStock ? "opacity-60 saturate-50" : ""}`} onError={() => setImageFailed(true)} />
         </Link>
-        {featured && <motion.span initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={viewportOnce} transition={{ duration: DUR.base, ease: EASE_OUT_EXPO, delay: 0.15 }} className="absolute left-3 top-3 rounded-full bg-violet-600 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white">New</motion.span>}
-        <WishlistButton productId={id} title={title} initial={Boolean(wishlisted)} className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full shadow transition" />
+        {/* Faint scrim on hover so the wishlist heart and any badge stay legible over bright art. */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {featured && <motion.span initial={{ opacity: 0, scale: 0.6 }} whileInView={{ opacity: 1, scale: 1 }} viewport={viewportOnce} transition={{ duration: DUR.base, ease: EASE_OUT_EXPO, delay: 0.15 }} className="absolute left-3 top-3 rounded-full bg-accent-600 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white shadow-glow-sm">New</motion.span>}
+        {isOutOfStock && <span className="absolute inset-x-0 bottom-0 bg-slate-950/80 py-1.5 text-center text-[10px] font-black uppercase tracking-wider text-white backdrop-blur-sm">Out of stock</span>}
+        <WishlistButton productId={id} title={title} initial={Boolean(wishlisted)} className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full shadow-md ring-1 ring-black/5 backdrop-blur transition" />
       </div>
-      <div className="p-3 flex flex-col gap-1.5">
-        {category && <span className="text-xs text-brand-accent uppercase tracking-wide">{category}</span>}
-        <Link href={href} className="line-clamp-1 text-sm font-bold text-slate-900 transition hover:text-violet-700">{title}</Link>
-        {brand && model ? <p className="text-sm text-gray-500">{brand} · {model}</p> : null}
-        {!brand && !model && category ? <p className="text-sm text-gray-500">{category}</p> : null}
-        <p className="text-sm text-amber-500">★★★★★ <span className="text-gray-400">(4.8)</span></p>
-        <p className="text-gray-900 font-black">Rs. {(price / 100).toLocaleString()} {featured && <span className="ml-1 text-xs font-normal text-gray-400 line-through">Rs. {(price / 90).toFixed(0)}</span>}</p>
-        <p className={`text-sm ${isOutOfStock ? "text-gray-500" : "text-green-600"}`}>{availabilityText}</p>
+      <div className="flex flex-col gap-1.5 p-3.5">
+        {category && <span className="text-[11px] font-bold uppercase tracking-[.14em] text-accent-700">{category}</span>}
+        <Link href={href} className="line-clamp-1 font-display text-[15px] font-black tracking-tight text-slate-900 transition hover:text-accent-700">{title}</Link>
+        {brand && model ? <p className="text-xs text-slate-500">{brand} · {model}</p> : null}
+        {!brand && !model && category ? <p className="text-xs text-slate-500">{category}</p> : null}
+        <p className="text-sm text-amber-500">★★★★★ <span className="text-slate-400">(4.8)</span></p>
+        <p className="font-display text-lg font-black text-slate-900">Rs. {(price / 100).toLocaleString()} {featured && <span className="ml-1 align-middle text-xs font-normal text-slate-400 line-through">Rs. {(price / 90).toFixed(0)}</span>}</p>
+        <p className={`flex items-center gap-1.5 text-xs font-semibold ${isOutOfStock ? "text-slate-400" : "text-emerald-600"}`}><span aria-hidden className={`inline-block h-1.5 w-1.5 rounded-full ${isOutOfStock ? "bg-slate-300" : "bg-emerald-500"}`} />{availabilityText}</p>
         <motion.button
           onClick={handleAdd}
           whileTap={{ scale: 0.95 }}
           transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }}
-          className={`relative mt-1.5 h-8 overflow-hidden rounded-lg text-[11px] font-bold text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${added ? "bg-emerald-600" : "bg-slate-950 hover:bg-violet-700"}`}
+          className={`relative mt-1.5 h-9 overflow-hidden rounded-xl text-[11px] font-bold uppercase tracking-wide text-white transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${added ? "bg-emerald-600" : "bg-slate-950 hover:bg-accent-700"}`}
           disabled={isOutOfStock}
         >
           <AnimatePresence initial={false} mode="popLayout">
