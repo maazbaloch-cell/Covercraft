@@ -43,38 +43,45 @@ export default async function ProductPage({ params }: { params: { id: string } }
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
-      {/* Receives the /shop card→hero FLIP; renders nothing on a normal visit. */}
-      <ProductFlip />
-      <nav className="mb-6 text-sm text-slate-500">
-        <a href="/shop" className="font-semibold text-violet-700 hover:underline">Shop</a>
-        <span className="mx-2">/</span>
-        <span className="text-slate-700">{product.title}</span>
-      </nav>
+    <main className="cinematic-scene relative isolate min-h-screen overflow-x-clip">
+      {/* Ambient wash — the Phase 9 FLIP lands here, so the whole surface is dark
+          and continuous. Decorative only, behind the content. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-aurora opacity-60" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.15]" />
 
-      <ProductDetail
-        id={product.id}
-        title={product.title}
-        price={product.price}
-        imageUrl={product.imageUrl}
-        description={product.description}
-        category={product.category}
-        brand={product.brand}
-        model={product.model}
-        stock={product.stock}
-        isAvailable={product.isAvailable}
-      />
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        {/* Receives the /shop card→hero FLIP; renders nothing on a normal visit. */}
+        <ProductFlip />
+        <nav className="mb-6 text-sm text-slate-400">
+          <a href="/shop" className="font-semibold text-accent-300 transition hover:text-accent-200">Shop</a>
+          <span className="mx-2 text-slate-600">/</span>
+          <span className="text-slate-200">{product.title}</span>
+        </nav>
 
-      {related.length > 0 && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-black text-slate-950">You may also like</h2>
-          <div className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} {...p} />
-            ))}
-          </div>
-        </section>
-      )}
+        <ProductDetail
+          id={product.id}
+          title={product.title}
+          price={product.price}
+          imageUrl={product.imageUrl}
+          description={product.description}
+          category={product.category}
+          brand={product.brand}
+          model={product.model}
+          stock={product.stock}
+          isAvailable={product.isAvailable}
+        />
+
+        {related.length > 0 && (
+          <section className="mt-16">
+            <h2 className="font-display text-2xl font-black tracking-cinema text-white">You may also like</h2>
+            <div className="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
+              {related.map((p) => (
+                <ProductCard key={p.id} {...p} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

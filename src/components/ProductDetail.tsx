@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/lib/cartStore";
 import WishlistButton from "@/components/WishlistButton";
 import { resolveProductImage } from "@/lib/productImage";
-import { DUR, EASE_OUT_EXPO } from "@/lib/motion";
+import { DUR, DUR_CINEMA, EASE_OUT_EXPO, EASE_CINEMATIC } from "@/lib/motion";
 
 export interface ProductDetailProps {
   id: string;
@@ -50,59 +50,66 @@ export default function ProductDetail(p: ProductDetailProps) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-      <div data-flip-hero className="relative aspect-square overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-        <Image src={displayImageUrl} alt={p.title} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" priority onError={() => setImageFailed(true)} />
-        <WishlistButton productId={p.id} title={p.title} initial={wishlisted} className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-lg shadow-lg transition" />
+      {/* Hero showcase. The frame is geometrically static so the /shop→hero FLIP
+          (Phase 9) lands precisely on data-flip-hero; the glow is a sibling behind
+          it, so hiding the hero mid-flight never disturbs the halo. */}
+      <div className="relative isolate self-start">
+        <div aria-hidden className="glow-ring pointer-events-none absolute inset-8 -z-10 rounded-full opacity-70" />
+        <div data-flip-hero className="relative aspect-square overflow-hidden rounded-3xl border border-white/10 bg-ink-800 shadow-depth-lg">
+          <Image src={displayImageUrl} alt={p.title} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" priority onError={() => setImageFailed(true)} />
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/40 via-transparent to-transparent" />
+          <WishlistButton productId={p.id} title={p.title} initial={wishlisted} className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-lg shadow-lg transition" />
+        </div>
       </div>
 
-      <div className="flex flex-col">
-        {p.category && <span className="text-xs font-bold uppercase tracking-[.2em] text-violet-700">{p.category}</span>}
-        <h1 className="mt-2 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{p.title}</h1>
-        {(p.brand || p.model) && <p className="mt-2 text-sm text-slate-500">{[p.brand, p.model].filter(Boolean).join(" · ")}</p>}
-        <p className="mt-1 text-sm text-amber-500">★★★★★ <span className="text-slate-400">(4.8)</span></p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC, delay: 0.1 }} className="flex flex-col">
+        {p.category && <span className="text-xs font-bold uppercase tracking-[.2em] text-accent-300">{p.category}</span>}
+        <h1 className="mt-2 font-display text-3xl font-black leading-tight tracking-cinema text-white sm:text-4xl">{p.title}</h1>
+        {(p.brand || p.model) && <p className="mt-2 text-sm text-slate-400">{[p.brand, p.model].filter(Boolean).join(" · ")}</p>}
+        <p className="mt-1 text-sm text-amber-400">★★★★★ <span className="text-slate-500">(4.8)</span></p>
 
-        <p className="mt-5 text-3xl font-black text-slate-950">Rs. {(p.price / 100).toLocaleString()}</p>
-        <p className={`mt-2 text-sm font-semibold ${isOutOfStock ? "text-rose-600" : "text-emerald-600"}`}>
+        <p className="mt-5 font-display text-3xl font-black text-white">Rs. {(p.price / 100).toLocaleString()}</p>
+        <p className={`mt-2 text-sm font-semibold ${isOutOfStock ? "text-rose-400" : "text-emerald-400"}`}>
           {isOutOfStock ? "Out of stock" : p.stock <= 5 ? `Only ${p.stock} left in stock` : "In stock"}
         </p>
 
-        {p.description && <p className="mt-5 max-w-prose leading-7 text-slate-600">{p.description}</p>}
+        {p.description && <p className="mt-5 max-w-prose leading-7 text-slate-300">{p.description}</p>}
 
         {!isOutOfStock && (
           <div className="mt-6 flex items-center gap-3">
-            <span className="text-sm font-semibold text-slate-700">Quantity</span>
-            <div className="flex items-center rounded-xl border border-slate-200">
-              <motion.button whileTap={{ scale: 0.85 }} type="button" aria-label="Decrease quantity" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="px-3 py-2 text-lg font-bold text-slate-600 transition-colors hover:text-violet-700 disabled:opacity-40">−</motion.button>
+            <span className="text-sm font-semibold text-slate-300">Quantity</span>
+            <div className="flex items-center rounded-xl border border-white/15 bg-white/5">
+              <motion.button whileTap={{ scale: 0.85 }} type="button" aria-label="Decrease quantity" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="px-3 py-2 text-lg font-bold text-slate-300 transition-colors hover:text-accent-300 disabled:opacity-40">−</motion.button>
               <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span key={qty} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="inline-block w-10 text-center text-sm font-bold">{qty}</motion.span>
+                <motion.span key={qty} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="inline-block w-10 text-center text-sm font-bold text-white">{qty}</motion.span>
               </AnimatePresence>
-              <motion.button whileTap={{ scale: 0.85 }} type="button" aria-label="Increase quantity" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="px-3 py-2 text-lg font-bold text-slate-600 transition-colors hover:text-violet-700 disabled:opacity-40">+</motion.button>
+              <motion.button whileTap={{ scale: 0.85 }} type="button" aria-label="Increase quantity" onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="px-3 py-2 text-lg font-bold text-slate-300 transition-colors hover:text-accent-300 disabled:opacity-40">+</motion.button>
             </div>
           </div>
         )}
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <motion.button whileHover={isOutOfStock ? undefined : { scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} onClick={() => addToCart(false)} disabled={isOutOfStock} className={`relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border px-6 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${added ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white"}`}>
+          <motion.button whileHover={isOutOfStock ? undefined : { scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} onClick={() => addToCart(false)} disabled={isOutOfStock} className={`relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border px-6 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${added ? "border-emerald-500 bg-emerald-500 text-white" : "border-white/20 text-white hover:bg-white hover:text-ink-950"}`}>
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span key={added ? "added" : isOutOfStock ? "oos" : "add"} initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="flex items-center gap-1.5">
                 {added ? "✓ Added to cart" : isOutOfStock ? "Out of stock" : "Add to cart"}
               </motion.span>
             </AnimatePresence>
           </motion.button>
-          <motion.button whileHover={isOutOfStock ? undefined : { scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} onClick={() => addToCart(true)} disabled={isOutOfStock} className="flex-1 rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50">
+          <motion.button whileHover={isOutOfStock ? undefined : { scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} onClick={() => addToCart(true)} disabled={isOutOfStock} className="flex-1 rounded-xl bg-accent-600 px-6 py-3 text-sm font-bold text-white shadow-glow transition-colors hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-50">
             Buy now
           </motion.button>
         </div>
 
-        <div className="mt-8 grid gap-3 border-t border-slate-100 pt-6 text-sm text-slate-600 sm:grid-cols-2">
-          <p className="flex items-center gap-2"><span className="text-violet-700">▣</span> Secure EasyPaisa checkout</p>
-          <p className="flex items-center gap-2"><span className="text-violet-700">↗</span> Fast dispatch across Pakistan</p>
-          <p className="flex items-center gap-2"><span className="text-violet-700">↶</span> Easy returns &amp; support</p>
-          <p className="flex items-center gap-2"><span className="text-violet-700">✦</span> Premium, made-to-last quality</p>
+        <div className="mt-8 grid gap-3 border-t border-white/10 pt-6 text-sm text-slate-300 sm:grid-cols-2">
+          <p className="flex items-center gap-2"><span className="text-accent-300">▣</span> Secure EasyPaisa checkout</p>
+          <p className="flex items-center gap-2"><span className="text-accent-300">↗</span> Fast dispatch across Pakistan</p>
+          <p className="flex items-center gap-2"><span className="text-accent-300">↶</span> Easy returns &amp; support</p>
+          <p className="flex items-center gap-2"><span className="text-accent-300">✦</span> Premium, made-to-last quality</p>
         </div>
 
-        <Link href="/shop" className="mt-8 text-sm font-bold text-violet-700">← Back to all covers</Link>
-      </div>
+        <Link href="/shop" className="mt-8 text-sm font-bold text-accent-300 transition hover:text-accent-200">← Back to all covers</Link>
+      </motion.div>
     </div>
   );
 }
