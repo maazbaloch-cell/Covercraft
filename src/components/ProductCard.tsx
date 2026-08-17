@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/lib/cartStore";
 import { resolveProductImage } from "@/lib/productImage";
+import { armProductFlip } from "@/lib/transition";
 import WishlistButton from "@/components/WishlistButton";
 import { DUR, EASE_OUT_EXPO, viewportOnce } from "@/lib/motion";
 
@@ -26,6 +27,7 @@ interface Props {
 
 export default function ProductCard({ id, title, price, imageUrl, category, brand, model, stock, isAvailable, featured, wishlisted, index = 0 }: Props) {
   const addItem = useCart((s) => s.addItem);
+  const imageRef = useRef<HTMLDivElement>(null);
   const [imageFailed, setImageFailed] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -42,6 +44,17 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
     window.setTimeout(() => setAdded(false), 1600);
   };
 
+  // Capture the cover image's viewport rect + resolved src on a plain click so
+  // the product page can fly it into the hero (Phase 9 FLIP). Modifier / middle
+  // clicks (open in new tab) are skipped so no orphaned flip is left armed.
+  const captureFlip = (e: React.MouseEvent) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const el = imageRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    armProductFlip({ id, src: displayImageUrl, rect: { top: r.top, left: r.left, width: r.width, height: r.height }, radius: 24, ts: Date.now() });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -51,8 +64,8 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       whileHover={{ y: -6 }}
       className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_2px_10px_rgb(15_23_42_/_0.04)] transition-[box-shadow,border-color] duration-300 hover:border-accent-300 hover:shadow-[0_22px_48px_-16px_rgb(109_40_217_/_0.30)]"
     >
-      <div className="relative aspect-[4/4.35] overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200/60">
-        <Link href={href} aria-label={`View ${title}`}>
+      <div ref={imageRef} className="relative aspect-[4/4.35] overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200/60">
+        <Link href={href} aria-label={`View ${title}`} onClick={captureFlip}>
           <Image src={displayImageUrl} alt={title} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" className={`object-cover transition duration-[650ms] ease-out group-hover:scale-[1.06] ${isOutOfStock ? "opacity-60 saturate-50" : ""}`} onError={() => setImageFailed(true)} />
         </Link>
         {/* Faint scrim on hover so the wishlist heart and any badge stay legible over bright art. */}
@@ -63,7 +76,7 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       </div>
       <div className="flex flex-col gap-1.5 p-3.5">
         {category && <span className="text-[11px] font-bold uppercase tracking-[.14em] text-accent-700">{category}</span>}
-        <Link href={href} className="line-clamp-1 font-display text-[15px] font-black tracking-tight text-slate-900 transition hover:text-accent-700">{title}</Link>
+        <Link href={href} onClick={captureFlip} className="line-clamp-1 font-display text-[15px] font-black tracking-tight text-slate-900 transition hover:text-accent-700">{title}</Link>
         {brand && model ? <p className="text-xs text-slate-500">{brand} · {model}</p> : null}
         {!brand && !model && category ? <p className="text-xs text-slate-500">{category}</p> : null}
         <p className="text-sm text-amber-500">★★★★★ <span className="text-slate-400">(4.8)</span></p>

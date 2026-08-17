@@ -40,3 +40,61 @@ export function consumeSportsDive(): boolean {
     return false;
   }
 }
+
+/**
+ * Product-entry FLIP handoff (Phase 9).
+ *
+ * Clicking a product card should read as the card's cover image flying into the
+ * product-detail hero — one continuous move across the /shop → /products/[id]
+ * route boundary. Unlike the Sports dive (a boolean), this carries a payload:
+ * the clicked image's viewport rect + resolved src + corner radius, captured
+ * synchronously on click. The receiver (<ProductFlip>) reads it once on the
+ * detail page and animates a ghost from that rect to the hero's rect.
+ *
+ * Same session-scoped, SSR-guarded, storage-error-tolerant contract as the
+ * Sports dive; the freshness timestamp lets the receiver ignore a stale flag
+ * from an abandoned/slow navigation so a flip never plays out of context.
+ */
+const PRODUCT_FLIP_KEY = "covercraft:product-flip";
+
+export interface ProductFlipPayload {
+  id: string;
+  src: string;
+  /** Viewport-relative rect of the source image (getBoundingClientRect). */
+  rect: { top: number; left: number; width: number; height: number };
+  /** Corner radius (px) of the source image container, so the ghost matches. */
+  radius: number;
+  /** Capture time (epoch ms); the receiver ignores stale payloads. */
+  ts: number;
+}
+
+/** Arm the flip handoff. Call synchronously on the card click, before navigating. */
+export function armProductFlip(payload: ProductFlipPayload): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(PRODUCT_FLIP_KEY, JSON.stringify(payload));
+  } catch {
+    // Storage disabled / quota: degrade to a plain navigation. Never break the click.
+  }
+}
+
+/**
+ * Read and clear the flip payload. Returns it at most once per arming, and only
+ * when fresh (armed within `maxAgeMs`) so a slow or abandoned navigation can't
+ * replay an out-of-context flip.
+ */
+export function consumeProductFlip(maxAgeMs = 1200): ProductFlipPayload | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(PRODUCT_FLIP_KEY);
+    if (!raw) return null;
+    window.sessionStorage.removeItem(PRODUCT_FLIP_KEY);
+    const payload = JSON.parse(raw) as ProductFlipPayload;
+    if (!payload || typeof payload.ts !== "number") return null;
+    // `Date.now()` here runs only in the browser at consume time (never SSR).
+    if (Date.now() - payload.ts > maxAgeMs) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}

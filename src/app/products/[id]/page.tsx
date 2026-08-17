@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "@/components/ProductDetail";
 import ProductCard from "@/components/ProductCard";
+import ProductFlip from "@/components/ProductFlip";
 import type { CatalogProduct } from "@/components/ShopCatalog";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
+      {/* Receives the /shop card→hero FLIP; renders nothing on a normal visit. */}
+      <ProductFlip />
       <nav className="mb-6 text-sm text-slate-500">
         <a href="/shop" className="font-semibold text-violet-700 hover:underline">Shop</a>
         <span className="mx-2">/</span>

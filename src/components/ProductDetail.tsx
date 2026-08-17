@@ -50,7 +50,7 @@ export default function ProductDetail(p: ProductDetailProps) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-      <div className="relative aspect-square overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+      <div data-flip-hero className="relative aspect-square overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
         <Image src={displayImageUrl} alt={p.title} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" priority onError={() => setImageFailed(true)} />
         <WishlistButton productId={p.id} title={p.title} initial={wishlisted} className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-lg shadow-lg transition" />
       </div>
