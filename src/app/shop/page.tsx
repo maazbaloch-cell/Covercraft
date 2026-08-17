@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ShopCatalog, { CatalogProduct } from "@/components/ShopCatalog";
+import CatalogArrival from "@/components/CatalogArrival";
 
 export const dynamic = "force-dynamic";
 
@@ -36,5 +37,11 @@ export default async function ShopPage() {
     console.error("Unable to load products from the database:", error);
   }
 
-  return <ShopCatalog products={products} />;
+  return (
+    <>
+      {/* Receiving half of the Sports→Catalog single-shot (Phase 6). No-op on a normal visit. */}
+      <CatalogArrival />
+      <ShopCatalog products={products} />
+    </>
+  );
 }

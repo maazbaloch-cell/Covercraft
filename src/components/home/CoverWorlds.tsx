@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { EASE_CINEMATIC, DUR, cinematicReveal, lineStagger, lineChild, viewportOnce } from "@/lib/motion";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { EASE_CINEMATIC, EASE_SOFT_INOUT, DUR, cinematicReveal, lineStagger, lineChild, viewportOnce } from "@/lib/motion";
+import { armSportsDive } from "@/lib/transition";
 
 /**
  * CoverWorlds — the three cover worlds (Phase 5).
@@ -15,7 +17,9 @@ import { EASE_CINEMATIC, DUR, cinematicReveal, lineStagger, lineChild, viewportO
  *
  * The worlds are a brand-narrative device, not DB categories (real categories
  * are phone models / styles), so every world links to the full /shop. The
- * Sports scene is the seed for Phase 6's Sports→Catalog single-shot transition.
+ * Sports scene's CTA additionally plays the Phase 6 Sports→Catalog single-shot:
+ * an emerald "dive" curtain that covers the screen, then hands off to
+ * CatalogArrival on /shop so the two routes read as one continuous camera move.
  *
  * Each scene gets a subtle scroll-parallax (backdrop and phone drift in
  * opposite directions) driven by its own useScroll → useTransform. All of it is
@@ -79,6 +83,34 @@ const WORLDS: readonly World[] = [
 ] as const;
 
 export default function CoverWorlds() {
+  const router = useRouter();
+  const reduce = useReducedMotion();
+  const [diving, setDiving] = useState(false);
+
+  // Warm the catalog route so the dive lands on a ready page (the overlay hides
+  // any remaining server round-trip on /shop, which is force-dynamic).
+  useEffect(() => {
+    router.prefetch("/shop");
+  }, [router]);
+
+  // Sports→Catalog single shot: cover the screen with the emerald dive, then
+  // hand off to the catalog's arrival overlay across the navigation. Reduced
+  // motion (or a modified click) skips straight to a normal navigation.
+  const enterCatalog = () => {
+    if (reduce) {
+      router.push("/shop");
+      return;
+    }
+    setDiving(true);
+  };
+
+  // Fire the navigation once the dive has fully covered the screen. Arming the
+  // handoff flag immediately before push lets /shop start already-covered.
+  const onDiveCovered = () => {
+    armSportsDive();
+    router.push("/shop");
+  };
+
   return (
     <section aria-labelledby="worlds-heading" className="relative w-full">
       {/* Intro */}
@@ -102,8 +134,16 @@ export default function CoverWorlds() {
       </div>
 
       {WORLDS.map((world, i) => (
-        <WorldScene key={world.key} world={world} flip={i % 2 === 1} />
+        <WorldScene
+          key={world.key}
+          world={world}
+          flip={i % 2 === 1}
+          onCta={world.key === "sports" ? enterCatalog : undefined}
+        />
       ))}
+
+      {/* Launch half of the Sports→Catalog single shot. */}
+      <AnimatePresence>{diving && <SportsDiveCurtain onCovered={onDiveCovered} />}</AnimatePresence>
     </section>
   );
 }
@@ -111,10 +151,20 @@ export default function CoverWorlds() {
 /* ------------------------------------------------------------------ *
  * A single world scene: themed backdrop + parallax phone + copy.
  * ------------------------------------------------------------------ */
-function WorldScene({ world, flip }: { world: World; flip: boolean }) {
+function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta?: () => void }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+
+  // A world with an onCta (Sports) plays the cinematic dive instead of a plain
+  // link — but only on an unmodified left click, so ⌘/ctrl/middle-click still
+  // open /shop normally and the control stays a real, keyboard-navigable link.
+  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!onCta) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    onCta();
+  };
 
   // Opposed parallax: backdrop sinks, phone rises, as the scene scrolls past.
   const backdropY = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["-8%", "8%"]);
@@ -162,6 +212,7 @@ function WorldScene({ world, flip }: { world: World; flip: boolean }) {
           <motion.div variants={lineChild} className="mt-8 flex justify-center lg:justify-start">
             <Link
               href={world.href}
+              onClick={handleCtaClick}
               className="group inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 text-sm font-bold text-white ring-1 ring-inset ring-white/20 backdrop-blur transition-colors duration-200 hover:bg-white/20"
             >
               {world.cta}
@@ -372,5 +423,59 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
         style={{ background: "radial-gradient(45% 40% at 25% 25%, rgba(16,185,129,0.20), transparent 60%), radial-gradient(45% 40% at 78% 75%, rgba(163,230,53,0.16), transparent 60%)" }}
       />
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * SportsDiveCurtain — the launch half of the Sports→Catalog single shot.
+ *
+ * A full-screen emerald "dive into the grid": the energy field rushes up from
+ * the center while the 58° speed streaks accelerate, ending fully covering the
+ * viewport. onCovered fires at that peak so navigation happens behind an opaque
+ * screen; the curtain then holds (it unmounts with the page) while /shop loads,
+ * and CatalogArrival continues the move from the same covered state.
+ * ------------------------------------------------------------------ */
+function SportsDiveCurtain({ onCovered }: { onCovered: () => void }) {
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-[120] overflow-hidden bg-[#04120c]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.28, ease: EASE_SOFT_INOUT }}
+    >
+      {/* Energy field rushing up from the grid. onCovered fires when this — the
+          slowest layer — finishes, i.e. once the screen is fully covered. */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 55% at 50% 62%, rgba(16,185,129,0.6), transparent 60%), radial-gradient(45% 40% at 78% 80%, rgba(163,230,53,0.45), transparent 60%)",
+        }}
+        initial={{ opacity: 0.4, scale: 0.25, y: "30%" }}
+        animate={{ opacity: 1, scale: 1.4, y: "0%" }}
+        transition={{ duration: 0.62, ease: EASE_CINEMATIC }}
+        onAnimationComplete={onCovered}
+      />
+      {/* Accelerating speed streaks. */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          background:
+            "repeating-linear-gradient(58deg, transparent 0 16px, rgba(255,255,255,0.12) 16px 18px, transparent 18px 30px)",
+        }}
+        initial={{ opacity: 0, scale: 1 }}
+        animate={{ opacity: 0.8, scale: 1.2 }}
+        transition={{ duration: 0.5, ease: EASE_CINEMATIC }}
+      />
+      {/* Center flash blooming at the peak of the dive. */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(28% 28% at 50% 55%, rgba(236,253,245,0.95), transparent 70%)" }}
+        initial={{ opacity: 0, scale: 0.3 }}
+        animate={{ opacity: 0.85, scale: 1.6 }}
+        transition={{ duration: 0.6, ease: EASE_CINEMATIC, delay: 0.08 }}
+      />
+    </motion.div>
   );
 }
