@@ -98,3 +98,23 @@ export function consumeProductFlip(maxAgeMs = 1200): ProductFlipPayload | null {
     return null;
   }
 }
+
+/**
+ * Peek — WITHOUT consuming — whether any bespoke cross-route transition is armed
+ * for the arriving navigation (the Sports dive or the product FLIP). The global
+ * page fade (template.tsx) uses this to step aside so it never dims the fixed
+ * arrival overlay those transitions depend on. The real consumers
+ * (consumeSportsDive / consumeProductFlip) still read + clear the flag, so this
+ * peek leaves nothing stale behind.
+ */
+export function hasArmedTransition(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return (
+      window.sessionStorage.getItem(SPORTS_DIVE_KEY) !== null ||
+      window.sessionStorage.getItem(PRODUCT_FLIP_KEY) !== null
+    );
+  } catch {
+    return false;
+  }
+}
