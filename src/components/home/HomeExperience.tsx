@@ -20,16 +20,18 @@ import {
 } from "@/lib/motion";
 
 /**
- * CinematicHome — the CoverCraft landing experience (Phase 3).
+ * CinematicHome — the CoverCraft landing experience.
  *
  * A dark, immersive brand story that sits on top of the existing motion tokens.
- * The shopping catalog now lives at /shop; this page's job is DISCOVER → ENTER:
- * a hero with the cover as a floating hero object, a teaser of the three cover
- * worlds, a strip of real featured products, and a closing call to action.
+ * The shopping catalog lives at /shop; this page's job is DISCOVER → ENTER →
+ * EXPLORE: a hero with the cover as a floating hero object (Hero), the
+ * scroll-as-camera "enter the product" scene (ScrollStory, Phase 4), the three
+ * immersive cover worlds (CoverWorlds, Phase 5), a strip of real featured
+ * products, and a closing call to action.
  *
- * Later phases deepen this (scroll-as-camera, full cover worlds, the
- * Sports→Catalog single-shot transition). All scroll-linked parallax is gated
- * on prefers-reduced-motion; entrance animations flow through <MotionProvider>.
+ * A later phase adds the Sports→Catalog single-shot transition. All
+ * scroll-linked parallax is gated on prefers-reduced-motion; entrance
+ * animations flow through <MotionProvider>.
  */
 export default function HomeExperience({ featured }: { featured: CatalogProduct[] }) {
   return (
