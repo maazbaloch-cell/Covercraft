@@ -53,10 +53,6 @@ const config: Config = {
           "radial-gradient(60% 60% at 20% 15%, rgb(124 58 237 / 0.28), transparent 60%), radial-gradient(50% 50% at 85% 25%, rgb(56 189 248 / 0.14), transparent 55%), radial-gradient(70% 70% at 60% 100%, rgb(91 33 182 / 0.30), transparent 60%)",
       },
       keyframes: {
-        float: {
-          "0%, 100%": { transform: "translate3d(0, 0, 0)" },
-          "50%": { transform: "translate3d(0, -14px, 0)" },
-        },
         "aurora-drift": {
           "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
           "50%": { transform: "translate3d(2%, -3%, 0) scale(1.08)" },
@@ -65,13 +61,9 @@ const config: Config = {
           "0%, 100%": { opacity: "0.45" },
           "50%": { opacity: "1" },
         },
-        shimmer: {
-          "100%": { transform: "translateX(100%)" },
-        },
       },
       animation: {
         // Ambient loops. All auto-neutralised under prefers-reduced-motion by globals.css.
-        float: "float 6.5s ease-in-out infinite",
         "aurora-drift": "aurora-drift 20s ease-in-out infinite",
         "pulse-glow": "pulse-glow 3.6s ease-in-out infinite",
       },

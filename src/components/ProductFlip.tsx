@@ -18,6 +18,14 @@ import { EASE_CINEMATIC } from "@/lib/motion";
  * untouched. Purely decorative: aria-hidden, pointer-events-none. Safety first —
  * a hard timeout always restores the hero, so an interrupted flight can never
  * leave it hidden; renders nothing on a normal (non-flip) visit or reduced motion.
+ *
+ * NOTE — this animates the layout box (top/left/width/height), NOT a compositor
+ * transform, by design. The card image (aspect 4/4.35) and the hero (square) differ
+ * in aspect ratio, so a transform scale would be non-uniform and visibly stretch the
+ * object-cover image mid-flight; interpolating the box instead lets object-cover
+ * re-crop each frame and land pixel-matched on the hero. The ghost is a single fixed
+ * element with one <img> child, so this reflows only its own subtree — never page
+ * content — making the cost negligible and a transform rewrite a net visual regression.
  */
 
 const FLIP_DURATION = 0.55; // seconds
