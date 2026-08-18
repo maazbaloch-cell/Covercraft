@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { DUR_CINEMA, EASE_CINEMATIC } from "@/lib/motion";
+import AuthShowcase from "@/components/account/AuthShowcase";
 
 type Mode = "login" | "signup" | "reset";
 
@@ -90,13 +91,15 @@ export default function AccountPage() {
   // input:focus rule (globals.css) layers the accent border + ring on focus.
   const inputClass = "mt-1.5 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-white placeholder:text-slate-500";
 
-  return <div className="cinematic-scene relative isolate flex min-h-screen flex-col justify-center overflow-x-clip px-6 py-16">
+  return <div className="cinematic-scene relative isolate flex min-h-screen items-center justify-center overflow-x-clip px-6 py-16">
     {/* Ambient wash — this is the storefront "enter" moment, so the auth card
         sits on a continuous cinematic surface between the dark header + footer. */}
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-aurora opacity-60" />
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.15]" />
 
-    <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC }} className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-depth-lg backdrop-blur-xl">
+    <div className="mx-auto grid w-full max-w-5xl items-center gap-10 lg:grid-cols-2">
+      <AuthShowcase mode={mode} />
+      <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC }} className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-depth-lg backdrop-blur-xl">
       <div className="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-accent-800/50 via-ink-850 to-ink-900 px-7 py-8">
         <div aria-hidden className="glow-ring pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full opacity-50" />
         <p className="text-xs font-bold uppercase tracking-[.2em] text-accent-300">CoverCraft account</p>
@@ -142,5 +145,6 @@ export default function AccountPage() {
         <Link href="/shop" className="mt-5 block text-center text-sm font-bold text-accent-300 transition hover:text-accent-200">Continue shopping →</Link>
       </div>
     </motion.div>
+    </div>
   </div>;
 }
