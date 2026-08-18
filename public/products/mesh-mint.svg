@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <defs>
+    <radialGradient id="mm1" cx="0.25" cy="0.3" r="0.6"><stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#5eead4" stop-opacity="0"/></radialGradient>
+    <radialGradient id="mm2" cx="0.8" cy="0.25" r="0.5"><stop offset="0" stop-color="#a7f3d0"/><stop offset="1" stop-color="#a7f3d0" stop-opacity="0"/></radialGradient>
+    <radialGradient id="mm3" cx="0.6" cy="0.85" r="0.6"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#67e8f9" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="800" height="1000" fill="#ecfeff"/>
+  <rect width="800" height="1000" fill="url(#mm1)"/>
+  <rect width="800" height="1000" fill="url(#mm2)"/>
+  <rect width="800" height="1000" fill="url(#mm3)"/>
+  <rect x="70" y="80" width="660" height="840" rx="58" fill="none" stroke="#0f766e" stroke-width="14" opacity="0.5"/>
+  <circle cx="150" cy="165" r="40" fill="#0f766e" opacity="0.85"/><circle cx="150" cy="165" r="15" fill="#ecfeff"/>
+</svg>
