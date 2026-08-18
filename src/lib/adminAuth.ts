@@ -1,13 +1,6 @@
-import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/jwt";
 
 export function verifyAdmin(req: NextRequest): { adminId: string; email: string } | null {
-  if (!process.env.JWT_SECRET) return null;
-  const token = req.cookies.get("admin_token")?.value;
-  if (!token) return null;
-  try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as { adminId: string; email: string };
-  } catch {
-    return null;
-  }
+  return verifyToken<{ adminId: string; email: string }>(req.cookies.get("admin_token")?.value);
 }

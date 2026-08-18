@@ -2,5 +2,13 @@ node_modules
 .next
 .env
 .env.local
+.env*.local
 *.log
 .DS_Store
+
+# Build artifacts
+*.tsbuildinfo
+
+# Never commit session credentials or secrets
+cookies.txt
+*.pem

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { markOrderPaidAndNotify } from "@/lib/orderConfirmation";
+import { failOrderAndRestoreStock, markOrderPaidAndNotify } from "@/lib/orderConfirmation";
 import { logPaymentEvent, paymentService } from "@/lib/paymentService";
 
 export async function POST(req: NextRequest) {
@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
   }
 
   const reason = fields.responseDesc || fields.desc || (paymentService.cancelled(fields) ? "Payment cancelled" : "Payment failed");
-  await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: "FAILED" } });
+  // Atomically fail the order and return any reserved standard-product stock (idempotent).
+  await failOrderAndRestoreStock(order.id, paymentService.cancelled(fields) ? "Payment cancelled; reserved stock released" : "Payment failed; reserved stock released");
   await prisma.payment.upsert({ where: { orderId: order.id }, update: { status: "FAILED", transactionId: fields.transactionId || orderNumber, method: "EasyPaisa", amount: order.totalAmount }, create: { orderId: order.id, method: "EasyPaisa", status: "FAILED", transactionId: fields.transactionId || orderNumber, amount: order.totalAmount } });
   logPaymentEvent(paymentService.cancelled(fields) ? "payment cancelled" : "payment failed", fields);
   return NextResponse.redirect(failedUrl(reason));

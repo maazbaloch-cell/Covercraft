@@ -3,11 +3,27 @@ import { NextRequest } from "next/server";
 type Entry = { count: number; resetAt: number };
 const buckets = new Map<string, Entry>();
 
-/** A lightweight edge-safe guard. Use a shared store (e.g. Upstash) for multi-instance production deployments. */
+// The Map lives in a single server process, so limits are per-instance and reset on redeploy.
+// That's adequate for a single-instance deployment; for horizontally-scaled production use a
+// shared store (e.g. Upstash Redis) keyed the same way. See docs/PRODUCTION-READINESS.
+let lastSweep = 0;
+const SWEEP_INTERVAL_MS = 60_000;
+
+// Drop expired buckets so the Map can't grow unbounded under a spray of unique keys/IPs.
+function sweep(now: number) {
+  if (now - lastSweep < SWEEP_INTERVAL_MS) return;
+  lastSweep = now;
+  for (const [key, entry] of buckets) {
+    if (entry.resetAt <= now) buckets.delete(key);
+  }
+}
+
+/** A lightweight in-memory guard. Synchronous by design so callers can gate without awaiting. */
 export function isRateLimited(req: NextRequest, scope: string, limit = 10, windowMs = 60_000) {
   const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const key = `${scope}:${forwarded || "unknown"}`;
   const now = Date.now();
+  sweep(now);
   const entry = buckets.get(key);
   if (!entry || entry.resetAt <= now) {
     buckets.set(key, { count: 1, resetAt: now + windowMs });

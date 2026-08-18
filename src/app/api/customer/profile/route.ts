@@ -6,9 +6,9 @@ import { customerProfileSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const session = verifyCustomer(req); if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const customer = await prisma.customer.findUnique({ where: { id: session.customerId }, select: { id: true, name: true, email: true, phone: true, createdAt: true, addresses: { orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }] }, settings: true } });
+  const customer = await prisma.customer.findUnique({ where: { id: session.customerId }, select: { id: true, name: true, email: true, phone: true, emailVerifiedAt: true, createdAt: true, addresses: { orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }] }, settings: true } });
   if (!customer) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ customer });
+  return NextResponse.json({ customer: { ...customer, emailVerified: Boolean(customer.emailVerifiedAt) } });
 }
 
 export async function PATCH(req: NextRequest) {

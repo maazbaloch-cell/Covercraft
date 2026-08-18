@@ -1,15 +1,24 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import ShopCatalog, { CatalogProduct } from "@/components/ShopCatalog";
+import type { CatalogProduct } from "@/components/ShopCatalog";
+import HomeExperience from "@/components/home/HomeExperience";
 
 export const dynamic = "force-dynamic";
 
-export default async function ShopPage() {
-  let products: CatalogProduct[] = [];
+export const metadata: Metadata = {
+  title: "CoverCraft — Your phone, wrapped in a story",
+  description:
+    "Cinematic mobile back covers engineered to protect and designed to turn heads. Explore the collection or craft one that's unmistakably yours.",
+};
+
+export default async function HomePage() {
+  let featured: CatalogProduct[] = [];
 
   try {
-    products = await prisma.product.findMany({
+    featured = await prisma.product.findMany({
       where: { deletedAt: null, isActive: true },
       orderBy: { createdAt: "desc" },
+      take: 6,
       select: {
         id: true,
         title: true,
@@ -25,10 +34,10 @@ export default async function ShopPage() {
       },
     });
   } catch (error) {
-    // Keep the full storefront rendered on a transient database failure instead
-    // of replacing it with a blank-looking fallback page.
-    console.error("Unable to load products from the database:", error);
+    // The landing page must still render its story even if the catalog query
+    // fails transiently; the featured strip simply hides when empty.
+    console.error("Home: unable to load featured products:", error);
   }
 
-  return <ShopCatalog products={products} />;
+  return <HomeExperience featured={featured} />;
 }

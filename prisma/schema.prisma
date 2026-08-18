@@ -16,13 +16,14 @@ model Admin {
 }
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  password        String
+  phone           String?
+  emailVerifiedAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   addresses Address[]
   orders    Order[]
   wishlist  WishlistItem[]
@@ -154,7 +155,6 @@ model Order {
   totalAmount         Int
   status              OrderStatus     @default(PENDING)
   paymentStatus       PaymentStatus   @default(UNPAID)
-  stripeSessionId     String?         @unique
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
   courier             String?
@@ -212,6 +212,19 @@ model Complaint {
   message     String
   channel     String   @default("whatsapp")
   createdAt   DateTime @default(now())
+}
+
+model VerificationCode {
+  id         String    @id @default(cuid())
+  email      String
+  purpose    String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email, purpose])
 }
 
 enum ProductType {
