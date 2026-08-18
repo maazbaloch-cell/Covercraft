@@ -1,1 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000"><rect width="800" height="1000" fill="#eef0f4"/><rect x="70" y="80" width="660" height="840" rx="58" fill="#d7dce5" stroke="#8e98a8" stroke-width="18"/><circle cx="150" cy="160" r="44" fill="#8e98a8"/><text x="400" y="560" text-anchor="middle" fill="#596579" font-family="Arial, sans-serif" font-size="42">COVER TEMPLATE</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="ph-base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#312e81"/>
+      <stop offset="0.5" stop-color="#6d28d9"/>
+      <stop offset="1" stop-color="#4c1d95"/>
+    </linearGradient>
+    <radialGradient id="ph-glow" cx="0.5" cy="0.42" r="0.5">
+      <stop offset="0" stop-color="#a78bfa" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#ph-base)"/>
+  <rect width="800" height="1000" fill="url(#ph-glow)"/>
+  <rect x="70" y="80" width="660" height="840" rx="58" fill="none" stroke="#ffffff" stroke-width="14" opacity="0.3"/>
+  <circle cx="150" cy="165" r="40" fill="#ffffff" opacity="0.8"/><circle cx="150" cy="165" r="15" fill="#4c1d95"/>
+  <g transform="translate(400,470)">
+    <rect x="-96" y="-96" width="192" height="192" rx="44" fill="#ffffff" opacity="0.14"/>
+    <text x="0" y="36" text-anchor="middle" fill="#ffffff" font-family="Georgia, 'Times New Roman', serif" font-size="150" font-weight="bold" opacity="0.95">C</text>
+  </g>
+  <text x="400" y="720" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="34" letter-spacing="6" opacity="0.7">COVERCRAFT</text>
+</svg>
