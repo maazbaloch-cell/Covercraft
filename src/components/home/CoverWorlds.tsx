@@ -175,7 +175,7 @@ function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta
     <div
       ref={ref}
       id={`world-${world.key}`}
-      className="relative flex min-h-screen w-full items-center overflow-hidden py-24"
+      className="relative flex min-h-[100svh] w-full items-center overflow-hidden py-24"
     >
       {/* Themed procedural backdrop (parallax) */}
       <motion.div style={{ y: backdropY }} aria-hidden className="pointer-events-none absolute inset-0 -z-10 scale-110">

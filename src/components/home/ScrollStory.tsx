@@ -127,7 +127,11 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
   // ----- Full pinned, scroll-driven scene. -----
   return (
     <section ref={trackRef} className="relative h-[300vh]">
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+      {/* Pinned scene uses svh (small viewport height), not vh: on mobile `vh`
+          is the chrome-hidden height, so a `h-screen` pin clips top/bottom while
+          the URL bar shows and jumps when it collapses mid-scroll. svh is stable
+          and fits the visible area; on desktop svh == vh so nothing changes. */}
+      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
         {/* framing */}
         <div aria-hidden className="vignette pointer-events-none absolute inset-0" />
         <p className="absolute left-1/2 top-20 -translate-x-1/2 text-[11px] font-bold uppercase tracking-[0.32em] text-accent-400/90">
@@ -162,7 +166,7 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
               Scroll to open
             </motion.span>
 
-            <motion.div style={{ scale: deviceScale, rotate: deviceRotate }} className="will-cinema relative h-[340px] w-[168px] sm:h-[460px] sm:w-[230px]">
+            <motion.div style={{ scale: deviceScale, rotate: deviceRotate }} className="will-cinema relative h-[300px] w-[150px] sm:h-[460px] sm:w-[230px]">
               {/* growing ambient light behind the revealed body */}
               <motion.div style={{ opacity: bodyGlow }} aria-hidden className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-accent-600/35 blur-3xl" />
 
