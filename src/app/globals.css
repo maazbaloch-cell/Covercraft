@@ -63,6 +63,13 @@
   input, textarea, select { transition: border-color .18s ease, box-shadow .18s ease; }
   input:focus, textarea:focus, select:focus { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px rgb(139 92 246 / .14); outline: none; }
   button, a { -webkit-tap-highlight-color: transparent; }
+  /* Visible keyboard-focus ring for interactive elements (WCAG 2.4.7 Focus Visible).
+     Only :focus-visible, so mouse/touch activation stays ring-free; inputs keep their
+     own accent box-shadow ring above. accent-400 reads on both dark and light surfaces. */
+  a:focus-visible, button:focus-visible, [role="button"]:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent-400);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {

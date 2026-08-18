@@ -137,7 +137,7 @@ export default function SiteNav() {
               >
                 {[...LINKS, { href: "/cart", label: "Cart" }, { href: "/admin", label: "Dashboard" }].map((l) => (
                   <motion.div key={l.href} variants={{ open: { opacity: 1, x: 0 }, closed: { opacity: 0, x: 24 } }} transition={{ duration: 0.3, ease: EASE_OUT_EXPO }}>
-                    <Link href={l.href} className={`block rounded-xl px-4 py-3 text-base font-bold transition-colors hover:bg-white/10 ${pathname === l.href ? "bg-white/10 text-white" : "text-slate-200"}`}>{l.label}</Link>
+                    <Link href={l.href} aria-current={pathname === l.href ? "page" : undefined} className={`block rounded-xl px-4 py-3 text-base font-bold transition-colors hover:bg-white/10 ${pathname === l.href ? "bg-white/10 text-white" : "text-slate-200"}`}>{l.label}</Link>
                   </motion.div>
                 ))}
               </motion.nav>
