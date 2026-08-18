@@ -61,7 +61,7 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       whileInView={{ opacity: 1, y: 0 }}
       viewport={viewportOnce}
       transition={{ duration: DUR.section, ease: EASE_OUT_EXPO, delay: (index % 5) * 0.05 }}
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -6, rotate: -0.6 }}
       className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_2px_10px_rgb(15_23_42_/_0.04)] transition-[box-shadow,border-color] duration-300 hover:border-accent-300 hover:shadow-[0_22px_48px_-16px_rgb(109_40_217_/_0.30)]"
     >
       <div ref={imageRef} className="relative aspect-[4/4.35] overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200/60">
@@ -77,9 +77,8 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       <div className="flex flex-col gap-1.5 p-3.5">
         {category && <span className="text-[11px] font-bold uppercase tracking-[.14em] text-accent-700">{category}</span>}
         <Link href={href} onClick={captureFlip} className="line-clamp-1 font-display text-[15px] font-black tracking-tight text-slate-900 transition hover:text-accent-700">{title}</Link>
-        {brand && model ? <p className="text-xs text-slate-500">{brand} · {model}</p> : null}
+        {brand && model ? <p className="text-xs text-slate-500">Fits {brand} {model}</p> : null}
         {!brand && !model && category ? <p className="text-xs text-slate-500">{category}</p> : null}
-        <p className="text-sm text-amber-500">★★★★★ <span className="text-slate-400">(4.8)</span></p>
         <p className="font-display text-lg font-black text-slate-900">Rs. {(price / 100).toLocaleString()} {featured && <span className="ml-1 align-middle text-xs font-normal text-slate-400 line-through">Rs. {(price / 90).toFixed(0)}</span>}</p>
         <p className={`flex items-center gap-1.5 text-xs font-semibold ${isOutOfStock ? "text-slate-400" : "text-emerald-600"}`}><span aria-hidden className={`inline-block h-1.5 w-1.5 rounded-full ${isOutOfStock ? "bg-slate-300" : "bg-emerald-500"}`} />{availabilityText}</p>
         <motion.button

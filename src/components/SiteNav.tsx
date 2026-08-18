@@ -116,9 +116,12 @@ export default function SiteNav() {
     <>
       {/* Desktop */}
       <nav className="hidden items-center gap-5 text-sm font-semibold text-slate-200 md:flex">
-        {LINKS.map((l) => (
-          <Link key={l.href} href={l.href} className="relative transition-colors hover:text-white">{l.label}</Link>
-        ))}
+        {LINKS.map((l) => {
+          const active = pathname === l.href;
+          return (
+            <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined} className={`relative transition-colors hover:text-white ${active ? "text-white after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-accent-400" : ""}`}>{l.label}</Link>
+          );
+        })}
         <AdminNav />
         <Link href="/cart" aria-label={`Cart${count ? `, ${count} items` : ""}`} className="ml-1 flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-white transition-colors hover:bg-white/20">
           {cartIcon}
@@ -135,6 +138,7 @@ export default function SiteNav() {
           onClick={() => setOpen(true)}
           aria-label="Open menu"
           aria-expanded={open}
+          aria-controls="mobile-menu"
           className="flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 active:scale-95"
         >
           <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
@@ -158,6 +162,7 @@ export default function SiteNav() {
             />
             <motion.aside
               ref={asideRef}
+              id="mobile-menu"
               role="dialog"
               aria-modal="true"
               aria-label="Menu"

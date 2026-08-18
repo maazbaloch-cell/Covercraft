@@ -126,6 +126,18 @@ function Hero({ cover }: { cover?: CatalogProduct }) {
           </Link>
         </motion.div>
 
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: DUR.slow, ease: EASE_OUT_EXPO, delay: 0.62 }}
+          className="mt-4 text-sm text-slate-400"
+        >
+          New to CoverCraft?{" "}
+          <Link href="/account" className="font-semibold text-accent-300 underline-offset-4 transition hover:text-accent-200 hover:underline">
+            Create your account
+          </Link>
+        </motion.p>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
