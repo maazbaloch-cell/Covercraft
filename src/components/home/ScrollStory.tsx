@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import type { CatalogProduct } from "@/components/ShopCatalog";
 import { resolveProductImage } from "@/lib/productImage";
-import { EASE_CINEMATIC, cinematicReveal, viewportOnce } from "@/lib/motion";
+import { cinematicReveal, viewportOnce } from "@/lib/motion";
 
 /**
  * ScrollStory — the "ENTER the product" scene (Phase 4).
@@ -47,7 +47,16 @@ const STAGES = [
 const SPECS = ["1.2 m drop-tested", "1.9 mm slim", "Qi wireless-ready", "Raised camera lip"] as const;
 
 export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
-  const reduce = useReducedMotion();
+  const reduceRaw = useReducedMotion();
+  // Defer the reduced-motion branch until after mount. useReducedMotion() reads
+  // matchMedia (client-only): branching the returned tree on it at render time
+  // makes the server (always false → pinned scene) and a reduced-motion client's
+  // first render (static tree) disagree → a hydration mismatch + layout flash.
+  // Gating on `mounted` keeps server + first client render on the pinned branch
+  // (they match), then honors the real preference once we're safely mounted.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduce = mounted && reduceRaw;
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
 

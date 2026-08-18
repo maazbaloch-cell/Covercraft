@@ -19,6 +19,6 @@ export function resolveProductImage(imageUrl: string | null | undefined, failed 
   // current route and 404s — returning the HTML error page, which breaks the
   // <Image>. Fall back to the shipped placeholder so a stray record can never
   // break the layout.
-  if (!/^(\/|https?:\/\/|data:)/.test(mapped)) return PRODUCT_IMAGE_FALLBACK;
+  if (!/^(\/|https?:\/\/|data:)/i.test(mapped)) return PRODUCT_IMAGE_FALLBACK;
   return mapped;
 }

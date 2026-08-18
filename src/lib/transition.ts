@@ -19,7 +19,8 @@ const SPORTS_DIVE_KEY = "covercraft:sports-dive";
 export function armSportsDive(): void {
   if (typeof window === "undefined") return;
   try {
-    window.sessionStorage.setItem(SPORTS_DIVE_KEY, "1");
+    // Store the arm time so a peek can tell a fresh arming from an orphaned flag.
+    window.sessionStorage.setItem(SPORTS_DIVE_KEY, String(Date.now()));
   } catch {
     // Private-mode / storage-disabled: the transition simply degrades to a
     // plain navigation. Never let a storage error break the click.
@@ -33,7 +34,7 @@ export function armSportsDive(): void {
 export function consumeSportsDive(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    const armed = window.sessionStorage.getItem(SPORTS_DIVE_KEY) === "1";
+    const armed = window.sessionStorage.getItem(SPORTS_DIVE_KEY) !== null;
     if (armed) window.sessionStorage.removeItem(SPORTS_DIVE_KEY);
     return armed;
   } catch {
@@ -100,20 +101,29 @@ export function consumeProductFlip(maxAgeMs = 1200): ProductFlipPayload | null {
 }
 
 /**
- * Peek — WITHOUT consuming — whether any bespoke cross-route transition is armed
- * for the arriving navigation (the Sports dive or the product FLIP). The global
- * page fade (template.tsx) uses this to step aside so it never dims the fixed
- * arrival overlay those transitions depend on. The real consumers
- * (consumeSportsDive / consumeProductFlip) still read + clear the flag, so this
- * peek leaves nothing stale behind.
+ * Peek — WITHOUT consuming — whether a *fresh* bespoke cross-route transition is
+ * armed for the arriving navigation (the Sports dive or the product FLIP). The
+ * global page fade (template.tsx) uses this to step aside so it never dims the
+ * fixed arrival overlay those transitions depend on. Both flags are armed right
+ * before navigating and consumed on arrival, so a flag older than `maxAgeMs` is
+ * orphaned (an abandoned/mis-routed nav) and is ignored here — otherwise it would
+ * silently suppress the fade for the rest of the session. The real consumers
+ * (consumeSportsDive / consumeProductFlip) still read + clear the flag.
  */
-export function hasArmedTransition(): boolean {
+export function hasArmedTransition(maxAgeMs = 1500): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return (
-      window.sessionStorage.getItem(SPORTS_DIVE_KEY) !== null ||
-      window.sessionStorage.getItem(PRODUCT_FLIP_KEY) !== null
-    );
+    const now = Date.now();
+    // Sports dive stores its arm time directly.
+    const dive = window.sessionStorage.getItem(SPORTS_DIVE_KEY);
+    if (dive !== null && now - Number(dive) <= maxAgeMs) return true;
+    // Product flip stores a JSON payload carrying its capture timestamp.
+    const flipRaw = window.sessionStorage.getItem(PRODUCT_FLIP_KEY);
+    if (flipRaw !== null) {
+      const ts = (JSON.parse(flipRaw) as ProductFlipPayload).ts;
+      if (typeof ts === "number" && now - ts <= maxAgeMs) return true;
+    }
+    return false;
   } catch {
     return false;
   }
