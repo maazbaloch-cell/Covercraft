@@ -7,9 +7,32 @@ import MotionProvider from "../components/MotionProvider";
 import StoreFooter from "../components/StoreFooter";
 import Toaster from "../components/Toaster";
 
+// Canonical origin for absolute metadata URLs (OG/Twitter). Reuses the same
+// NEXT_PUBLIC_BASE_URL the app already uses for payment/email/WhatsApp links;
+// falls back to localhost in dev so `new URL()` never throws at build time.
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const SITE_NAME = "CoverCraft";
+const SITE_TITLE = "CoverCraft — Mobile Back Covers";
+const SITE_DESCRIPTION = "Custom mobile back covers, designs & templates";
+
 export const metadata: Metadata = {
-  title: "CoverCraft — Mobile Back Covers",
-  description: "Custom mobile back covers, designs & templates",
+  metadataBase: new URL(siteUrl),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -28,18 +28,54 @@ export default function SiteNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const count = mounted ? items.reduce((sum, i) => sum + i.quantity, 0) : 0;
+  const asideRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => setMounted(true), []);
   // Close the drawer whenever navigation lands on a new route.
   useEffect(() => setOpen(false), [pathname]);
-  // Lock body scroll while the drawer is open.
+  // While the drawer is open: lock body scroll, trap focus inside it, and on
+  // close restore focus to whatever opened it (WCAG 2.4.3 Focus Order / 2.1.2
+  // No Keyboard Trap). Escape and backdrop-click still close it.
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+
+    const opener = (triggerRef.current ?? document.activeElement) as HTMLElement | null;
+    const getFocusable = () =>
+      asideRef.current
+        ? Array.from(
+            asideRef.current.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )
+          )
+        : [];
+    // Move focus into the drawer (its first control) so keyboard users start inside.
+    getFocusable()[0]?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); return; }
+      if (e.key !== "Tab") return;
+      const els = getFocusable();
+      if (els.length === 0) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      const active = document.activeElement;
+      // Wrap focus at the edges and pull it back in if it ever escapes the drawer.
+      if (e.shiftKey && (active === first || !asideRef.current?.contains(active))) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault(); first.focus();
+      }
+    };
     window.addEventListener("keydown", onKey);
-    return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+      // Return focus to the trigger so keyboard users aren't dropped at page top.
+      opener?.focus?.();
+    };
   }, [open]);
 
   // Bounce the cart icon each time the item count grows (add-to-cart feedback).
@@ -95,6 +131,7 @@ export default function SiteNav() {
         <Link href="/cart" aria-label={`Cart${count ? `, ${count} items` : ""}`} className="flex items-center text-white">{cartIcon}</Link>
         <button
           type="button"
+          ref={triggerRef}
           onClick={() => setOpen(true)}
           aria-label="Open menu"
           aria-expanded={open}
@@ -120,6 +157,7 @@ export default function SiteNav() {
               onClick={() => setOpen(false)}
             />
             <motion.aside
+              ref={asideRef}
               role="dialog"
               aria-modal="true"
               aria-label="Menu"
