@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { DUR_CINEMA, EASE_CINEMATIC } from "@/lib/motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { DUR, DUR_CINEMA, EASE_CINEMATIC, EASE_OUT_EXPO } from "@/lib/motion";
+import AuthShowcase from "@/components/account/AuthShowcase";
 
 type Mode = "login" | "signup" | "reset";
 
@@ -21,6 +22,19 @@ export default function AccountPage() {
   const [resetStep, setResetStep] = useState<"request" | "confirm">("request");
   const [resetCode, setResetCode] = useState("");
   const [resetPassword, setResetPassword] = useState("");
+  // Presentation-only: password visibility + the post-auth "success light" beat.
+  const [showPw, setShowPw] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const reduce = useReducedMotion();
+
+  // Play a short positive-light beat, then run the EXISTING redirect. Navigation
+  // is instant under reduced motion so the animation never delays authentication.
+  const goSuccess = () => {
+    setSuccess(true);
+    const nav = () => { router.replace("/account/dashboard"); router.refresh(); };
+    if (reduce) nav();
+    else window.setTimeout(nav, 480);
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -35,8 +49,7 @@ export default function AccountPage() {
       const response = await fetch(`/api/customer/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ name, email, password }) });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) return setError(body.error || "Something went wrong. Please try again.");
-      router.replace("/account/dashboard");
-      router.refresh();
+      goSuccess();
     } catch {
       setError("We could not reach the server. Please try again.");
     } finally {
@@ -88,15 +101,18 @@ export default function AccountPage() {
 
   // Shared dark-cinematic input skin. Idle is a subtle glass field; the global
   // input:focus rule (globals.css) layers the accent border + ring on focus.
-  const inputClass = "mt-1.5 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-white placeholder:text-slate-500";
+  const inputBase = "w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-white placeholder:text-slate-500";
+  const inputClass = `mt-1.5 ${inputBase}`;
 
-  return <div className="cinematic-scene relative isolate flex min-h-screen flex-col justify-center overflow-x-clip px-6 py-16">
+  return <div className="cinematic-scene relative isolate flex min-h-screen items-center justify-center overflow-x-clip px-6 py-16">
     {/* Ambient wash — this is the storefront "enter" moment, so the auth card
         sits on a continuous cinematic surface between the dark header + footer. */}
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-aurora opacity-60" />
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.15]" />
 
-    <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC }} className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-depth-lg backdrop-blur-xl">
+    <div className="mx-auto grid w-full max-w-5xl items-center gap-10 lg:grid-cols-2">
+      <AuthShowcase mode={mode} />
+      <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC }} className="mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-depth-lg backdrop-blur-xl">
       <div className="relative overflow-hidden border-b border-white/10 bg-gradient-to-br from-accent-800/50 via-ink-850 to-ink-900 px-7 py-8">
         <div aria-hidden className="glow-ring pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full opacity-50" />
         <p className="text-xs font-bold uppercase tracking-[.2em] text-accent-300">CoverCraft account</p>
@@ -117,7 +133,7 @@ export default function AccountPage() {
           ) : (
             <form onSubmit={confirmReset} className="space-y-4">
               <label className="block text-sm font-semibold text-slate-300">6-digit code<input required inputMode="numeric" maxLength={6} value={resetCode} onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 6))} className={`${inputClass} text-center tracking-[0.4em]`} placeholder="123456" /></label>
-              <label className="block text-sm font-semibold text-slate-300">New password<input required type="password" minLength={12} value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className={inputClass} placeholder="At least 12 characters" /></label>
+              <label className="block text-sm font-semibold text-slate-300 transition-transform duration-200 focus-within:-translate-y-0.5">New password<div className="relative mt-1.5"><input required type={showPw ? "text" : "password"} minLength={12} value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className={`${inputBase} pr-16`} placeholder="At least 12 characters" /><button type="button" onClick={() => setShowPw((v) => !v)} aria-pressed={showPw} aria-label={showPw ? "Hide password" : "Show password"} className="absolute inset-y-0 right-0 flex items-center rounded-r-xl px-3 text-xs font-bold text-accent-300 transition hover:text-accent-200">{showPw ? "Hide" : "Show"}</button></div></label>
               {error && <p role="alert" className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">{error}</p>}
               <button disabled={loading} className="w-full rounded-xl bg-accent-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Please wait…" : "Reset password"}</button>
               <button type="button" onClick={requestReset} className="w-full text-center text-sm font-bold text-accent-300 transition hover:text-accent-200">Resend code</button>
@@ -127,7 +143,7 @@ export default function AccountPage() {
           <form onSubmit={submit} className="space-y-4">
             {mode === "signup" && <label className="block text-sm font-semibold text-slate-300">Full name<input required autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} className={inputClass} placeholder="Your name" /></label>}
             <label className="block text-sm font-semibold text-slate-300">Email address<input required autoComplete="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="you@example.com" /></label>
-            <label className="block text-sm font-semibold text-slate-300">Password<input required autoComplete={mode === "login" ? "current-password" : "new-password"} type="password" minLength={mode === "signup" ? 12 : undefined} value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder={mode === "signup" ? "At least 12 characters" : "Your password"} /></label>
+            <label className="block text-sm font-semibold text-slate-300 transition-transform duration-200 focus-within:-translate-y-0.5">Password<div className="relative mt-1.5"><input required autoComplete={mode === "login" ? "current-password" : "new-password"} type={showPw ? "text" : "password"} minLength={mode === "signup" ? 12 : undefined} value={password} onChange={(event) => setPassword(event.target.value)} className={`${inputBase} pr-16`} placeholder={mode === "signup" ? "At least 12 characters" : "Your password"} /><button type="button" onClick={() => setShowPw((v) => !v)} aria-pressed={showPw} aria-label={showPw ? "Hide password" : "Show password"} className="absolute inset-y-0 right-0 flex items-center rounded-r-xl px-3 text-xs font-bold text-accent-300 transition hover:text-accent-200">{showPw ? "Hide" : "Show"}</button></div></label>
             {mode === "login" && <button type="button" onClick={() => switchMode("reset")} className="block text-left text-sm font-bold text-accent-300 transition hover:text-accent-200">Forgot password?</button>}
             {error && <p role="alert" className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">{error}</p>}
             <button disabled={loading} className="w-full rounded-xl bg-accent-600 px-5 py-3 text-sm font-bold text-white shadow-glow transition hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
@@ -142,5 +158,19 @@ export default function AccountPage() {
         <Link href="/shop" className="mt-5 block text-center text-sm font-bold text-accent-300 transition hover:text-accent-200">Continue shopping →</Link>
       </div>
     </motion.div>
+    </div>
+
+    {/* Successful auth → a short positive-light beat, then the existing redirect. */}
+    <AnimatePresence>
+      {success && (
+        <motion.div key="auth-success" aria-hidden className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: DUR.base, ease: EASE_OUT_EXPO }}>
+          <div className="absolute inset-0 bg-ink-950/50" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.35),transparent_60%)]" />
+          <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: DUR.slow, ease: EASE_CINEMATIC }} className="relative flex h-20 w-20 items-center justify-center rounded-full bg-accent-600 shadow-glow">
+            <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5l5 5L20 6.5" /></svg>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </div>;
 }

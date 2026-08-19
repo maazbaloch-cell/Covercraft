@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ProductDetail from "@/components/ProductDetail";
@@ -53,7 +54,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
         {/* Receives the /shop card→hero FLIP; renders nothing on a normal visit. */}
         <ProductFlip />
         <nav className="mb-6 text-sm text-slate-400">
-          <a href="/shop" className="font-semibold text-accent-300 transition hover:text-accent-200">Shop</a>
+          <Link href="/shop" className="font-semibold text-accent-300 transition hover:text-accent-200">Shop</Link>
           <span className="mx-2 text-slate-600">/</span>
           <span className="text-slate-200">{product.title}</span>
         </nav>

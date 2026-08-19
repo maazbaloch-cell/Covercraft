@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // three / @react-three ship ESM that Next needs to transpile for the server
+  // build (drei re-exports three internals). Without this the 3D phone can fail
+  // the production build even though it runs fine in dev.
+  transpilePackages: ["three"],
   async headers() {
     return [{
       source: "/(.*)",

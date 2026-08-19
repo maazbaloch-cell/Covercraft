@@ -12,7 +12,7 @@ function FailedContent() {
   const reason = params.get("reason");
 
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center sm:py-24">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="util-dark mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center sm:py-24">
       {/* Calm entrance — a gentle fade/scale, deliberately no bounce or celebration. */}
       <motion.span variants={fadeInUp} className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-3xl text-rose-600">!</motion.span>
       <motion.h1 variants={fadeInUp} className="mt-6 text-3xl font-black tracking-tight text-slate-950">Payment failed</motion.h1>
@@ -26,7 +26,7 @@ function FailedContent() {
         No charge was made. You can try again or use a different payment method.
       </motion.p>
       <motion.div variants={fadeInUp} className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
-        <Link href="/cart" className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700">
+        <Link href="/cart" className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-700">
           Back to cart →
         </Link>
         <Link href="/complaint" className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-slate-100">
@@ -39,7 +39,7 @@ function FailedContent() {
 
 export default function FailedPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-lg px-6 py-20 text-center text-slate-500">Loading…</div>}>
+    <Suspense fallback={<div className="util-dark mx-auto min-h-[60vh] max-w-lg px-6 py-20 text-center text-slate-400">Loading…</div>}>
       <FailedContent />
     </Suspense>
   );

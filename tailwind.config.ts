@@ -9,28 +9,38 @@ const config: Config = {
         // so the "app" surfaces (cart, checkout, admin, designer) that use `brand`/`brand-accent`
         // stay visually consistent with the marketing pages. Change these two values to re-skin.
         brand: {
-          DEFAULT: "#0f172a", // slate-950 — primary dark
-          accent: "#6d28d9", // violet-700 — accent (matches storefront hover:bg-violet-700)
+          DEFAULT: "#0b1120", // near-black slate — primary dark
+          accent: "#2563eb", // blue-600 — brand accent
         },
-        // Cinematic redesign palette (Phase 2). `ink` = the deep, layered canvas used by
-        // immersive surfaces (home, product worlds, product detail). `accent` = the violet
-        // brand light that carries through glows, gradients and focus states.
+        // Cinematic redesign palette. `ink` = the deep, layered canvas used by immersive
+        // surfaces (home, product worlds, product detail). `accent` = the BRAND BLUE light
+        // that carries through glows, gradients and focus states across the whole site.
         ink: {
-          950: "#050609", // base canvas — near-black with a cool cast
-          900: "#0a0b12",
-          850: "#0d0f19",
-          800: "#111320",
-          700: "#171a2b",
-          600: "#1f2338",
-          500: "#2a2f4a",
+          950: "#04060d", // base canvas — near-black with a cool blue cast
+          900: "#070b16",
+          850: "#0a0f1d",
+          800: "#0e1424",
+          700: "#141b30",
+          600: "#1c2540",
+          500: "#273154",
         },
+        // Brand blue — the single UI accent. Premium, cool, high-tech.
         accent: {
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9", // == brand.accent
-          800: "#5b21b6",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8", // == brand.accent family
+          800: "#1e40af",
+        },
+        // Product/cover accent — used ONLY for the hero phone case & product art,
+        // never for UI chrome (keeps the interface strictly blue + black).
+        cover: {
+          300: "#fdba74",
+          400: "#fb923c",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410c",
         },
       },
       fontFamily: {
@@ -42,15 +52,15 @@ const config: Config = {
         cinema: "-0.045em", // tight display tracking for large cinematic headlines
       },
       boxShadow: {
-        glow: "0 0 44px -8px rgb(124 58 237 / 0.55)",
-        "glow-sm": "0 0 24px -6px rgb(124 58 237 / 0.5)",
+        glow: "0 0 44px -8px rgb(37 99 235 / 0.55)",
+        "glow-sm": "0 0 24px -6px rgb(37 99 235 / 0.5)",
         depth: "0 30px 60px -22px rgb(0 0 0 / 0.6)",
         "depth-lg": "0 55px 110px -30px rgb(0 0 0 / 0.78)",
       },
       backgroundImage: {
-        // Ambient cinematic backdrop (used behind immersive scenes).
+        // Ambient cinematic backdrop (used behind immersive scenes) — brand blue.
         aurora:
-          "radial-gradient(60% 60% at 20% 15%, rgb(124 58 237 / 0.28), transparent 60%), radial-gradient(50% 50% at 85% 25%, rgb(56 189 248 / 0.14), transparent 55%), radial-gradient(70% 70% at 60% 100%, rgb(91 33 182 / 0.30), transparent 60%)",
+          "radial-gradient(60% 60% at 20% 15%, rgb(37 99 235 / 0.30), transparent 60%), radial-gradient(50% 50% at 85% 25%, rgb(56 189 248 / 0.14), transparent 55%), radial-gradient(70% 70% at 60% 100%, rgb(29 78 216 / 0.32), transparent 60%)",
       },
       keyframes: {
         "aurora-drift": {

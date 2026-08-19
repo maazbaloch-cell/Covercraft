@@ -26,8 +26,8 @@ function AnimatedNumber({ value, prefix = "", format = (n: number) => Math.round
 const STATUS_BADGE: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
   CONFIRMED: "bg-sky-100 text-sky-700",
-  PROCESSING: "bg-indigo-100 text-indigo-700",
-  SHIPPED: "bg-violet-100 text-violet-700",
+  PROCESSING: "bg-cyan-100 text-cyan-700",
+  SHIPPED: "bg-teal-100 text-teal-700",
   OUT_FOR_DELIVERY: "bg-blue-100 text-blue-700",
   DELIVERED: "bg-emerald-100 text-emerald-700",
   CANCELLED: "bg-rose-100 text-rose-700",
@@ -69,6 +69,7 @@ export default function AdminDashboard() {
   const [catalog, setCatalog] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [modelForm, setModelForm] = useState({ name: "", brand: "" });
+  const [templateCatForm, setTemplateCatForm] = useState({ mobileModelId: "", name: "", price: "1999", imageUrl: "" });
   const [templateForms, setTemplateForms] = useState<TemplateFormState[]>([createTemplateForm()]);
   const [report, setReport] = useState<any>(null);
   const [reportRange, setReportRange] = useState({ start: "", end: "" });
@@ -145,6 +146,7 @@ export default function AdminDashboard() {
   }, [router]);
 
   const addModel = async (event: React.FormEvent) => { event.preventDefault(); const res = await fetch("/api/admin/custom-cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "model", ...modelForm }), credentials: "include" }); if (res.ok) { setModelForm({ name: "", brand: "" }); loadCatalog(); } };
+  const addTemplate = async (event: React.FormEvent) => { event.preventDefault(); const price = Math.round(Number(templateCatForm.price) * 100); if (!templateCatForm.mobileModelId || !templateCatForm.name.trim() || !(price > 0)) return; const res = await fetch("/api/admin/custom-cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "template", name: templateCatForm.name.trim(), mobileModelId: templateCatForm.mobileModelId, price, imageUrl: templateCatForm.imageUrl.trim() || undefined }), credentials: "include" }); if (res.ok) { setTemplateCatForm({ mobileModelId: "", name: "", price: "1999", imageUrl: "" }); loadCatalog(); } };
   const updateTemplateForm = (formId: number, updates: Partial<TemplateFormState>) => {
     setTemplateForms((prev) => prev.map((form) => (form.id === formId ? { ...form, ...updates } : form)));
   };
@@ -256,7 +258,7 @@ export default function AdminDashboard() {
 
       <section className="mb-10 bg-white border rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold">Cover Templates</h2>
+          <h2 className="font-semibold">Shop Products</h2>
           <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} type="button" onClick={addTemplateForm} className="rounded border border-brand px-3 py-2 text-sm text-brand transition-colors hover:bg-brand hover:text-white">Add another template</motion.button>
         </div>
         <AnimatePresence initial={false}>
@@ -295,6 +297,59 @@ export default function AdminDashboard() {
       </section>
 
       <section className="mb-10 bg-white border rounded-xl p-5">
+        <h2 className="font-semibold mb-1">Custom Cover Catalog</h2>
+        <p className="text-sm text-gray-500 mb-4">Phone models and cover templates customers personalise at <span className="font-medium">/customize-cover</span>. Without at least one model — and a template on it — the customiser has nothing to show.</p>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <form onSubmit={addModel} className="space-y-2 border rounded-lg p-3">
+              <p className="text-sm font-medium">Add phone model</p>
+              <input required placeholder="Model name (e.g. iPhone 15 Pro)" value={modelForm.name} onChange={(e) => setModelForm({ ...modelForm, name: e.target.value })} className="w-full border rounded px-3 py-2" />
+              <input required placeholder="Brand (e.g. Apple)" value={modelForm.brand} onChange={(e) => setModelForm({ ...modelForm, brand: e.target.value })} className="w-full border rounded px-3 py-2" />
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} type="submit" className="bg-brand text-white rounded px-3 py-2 text-sm transition-colors hover:bg-brand-accent">Add model</motion.button>
+            </form>
+            <form onSubmit={addTemplate} className="space-y-2 border rounded-lg p-3">
+              <p className="text-sm font-medium">Add cover template</p>
+              <select required value={templateCatForm.mobileModelId} onChange={(e) => setTemplateCatForm({ ...templateCatForm, mobileModelId: e.target.value })} className="w-full border rounded px-3 py-2">
+                <option value="">Select phone model…</option>
+                {catalog.map((m: any) => (<option key={m.id} value={m.id}>{m.brand} · {m.name}</option>))}
+              </select>
+              <input required placeholder="Template name" value={templateCatForm.name} onChange={(e) => setTemplateCatForm({ ...templateCatForm, name: e.target.value })} className="w-full border rounded px-3 py-2" />
+              <input required type="number" min="1" placeholder="Price in rupees" value={templateCatForm.price} onChange={(e) => setTemplateCatForm({ ...templateCatForm, price: e.target.value })} className="w-full border rounded px-3 py-2" />
+              <input placeholder="Image URL (optional)" value={templateCatForm.imageUrl} onChange={(e) => setTemplateCatForm({ ...templateCatForm, imageUrl: e.target.value })} className="w-full border rounded px-3 py-2" />
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} type="submit" disabled={catalog.length === 0} className="bg-brand text-white rounded px-3 py-2 text-sm transition-colors hover:bg-brand-accent disabled:opacity-50">Add template</motion.button>
+              {catalog.length === 0 && <p className="text-xs text-gray-400">Add a phone model first.</p>}
+            </form>
+          </div>
+          <div className="space-y-2">
+            {catalog.length === 0 ? (
+              <p className="text-sm text-gray-500 border border-dashed rounded-lg p-6 text-center">No phone models yet. Add one so customers can start customising.</p>
+            ) : (
+              catalog.map((m: any) => (
+                <motion.div key={m.id} whileHover={{ y: -2 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="border rounded p-3 transition-colors duration-300 hover:border-brand/40 hover:bg-slate-50">
+                  <div className="flex justify-between items-start">
+                    <p className="font-medium">{m.brand} · {m.name}</p>
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeCatalogItem("model", m.id)} className="text-xs text-red-500 transition-colors hover:text-red-700">Remove model</motion.button>
+                  </div>
+                  {m.templates?.length ? (
+                    <ul className="mt-2 space-y-1">
+                      {m.templates.map((t: any) => (
+                        <li key={t.id} className="flex justify-between items-center text-sm text-gray-600">
+                          <span>{t.name} — Rs. {(t.price / 100).toFixed(0)}</span>
+                          <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeCatalogItem("template", t.id)} className="text-xs text-red-500 transition-colors hover:text-red-700">Remove</motion.button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-400">No templates yet for this model.</p>
+                  )}
+                </motion.div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-10 bg-white border rounded-xl p-5">
         <h2 className="font-semibold mb-4">Analytics</h2>
         <motion.div variants={staggerGrid} initial="hidden" whileInView="show" viewport={viewportOnce} className="grid md:grid-cols-4 gap-4 mb-4">
           <motion.div variants={scaleIn} className="border rounded p-3 transition-shadow duration-300 hover:shadow-sm"><p className="text-sm text-gray-500">Orders</p><p className="text-xl font-bold"><AnimatedNumber value={report?.totalOrders ?? 0} /></p></motion.div>
@@ -320,7 +375,7 @@ export default function AdminDashboard() {
       <h2 className="font-semibold mb-3">Orders</h2>
       <motion.div variants={staggerGrid} initial="hidden" animate="show" className="space-y-3">
         {data.orders.map((o: any) => (
-          <motion.div key={o.id} variants={fadeInUp} whileHover={{ y: -2 }} className="bg-white border rounded-xl p-4 transition-shadow duration-300 hover:border-violet-200 hover:shadow-md">
+          <motion.div key={o.id} variants={fadeInUp} whileHover={{ y: -2 }} className="bg-white border rounded-xl p-4 transition-shadow duration-300 hover:border-brand/40 hover:shadow-md">
             <div className="flex flex-col md:flex-row justify-between gap-3 mb-3">
               <div>
                 <p className="font-semibold">{o.orderNumber} — {o.customerName}</p>

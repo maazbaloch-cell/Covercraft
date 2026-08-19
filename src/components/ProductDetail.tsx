@@ -65,8 +65,7 @@ export default function ProductDetail(p: ProductDetailProps) {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC, delay: 0.1 }} className="flex flex-col">
         {p.category && <span className="text-xs font-bold uppercase tracking-[.2em] text-accent-300">{p.category}</span>}
         <h1 className="mt-2 font-display text-3xl font-black leading-tight tracking-cinema text-white sm:text-4xl">{p.title}</h1>
-        {(p.brand || p.model) && <p className="mt-2 text-sm text-slate-400">{[p.brand, p.model].filter(Boolean).join(" · ")}</p>}
-        <p className="mt-1 text-sm text-amber-400">★★★★★ <span className="text-slate-500">(4.8)</span></p>
+        {(p.brand || p.model) && <p className="mt-2 text-sm text-slate-400">Compatible with {[p.brand, p.model].filter(Boolean).join(" ")}</p>}
 
         <p className="mt-5 font-display text-3xl font-black text-white">Rs. {(p.price / 100).toLocaleString()}</p>
         <p className={`mt-2 text-sm font-semibold ${isOutOfStock ? "text-rose-400" : "text-emerald-400"}`}>
