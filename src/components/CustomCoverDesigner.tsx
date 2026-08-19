@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cartStore";
+import { getPhoneShape } from "@/lib/phoneShapes";
 
 type Catalog = { id: string; name: string; brand: string; templates: { id: string; name: string; price: number; imageUrl?: string | null }[] }[];
 
@@ -95,59 +96,27 @@ export default function CustomCoverDesigner() {
       const shell = coverShell.current;
       if (!canvas || !shell || !model) return;
 
-      const modelName = `${model.brand} ${model.name}`.toLowerCase();
-      const isIphone = modelName.includes("iphone") || model.brand.toLowerCase() === "apple";
-      const isPixel = modelName.includes("pixel") || model.brand.toLowerCase() === "google";
-      const isSamsung = modelName.includes("samsung") || model.brand.toLowerCase() === "samsung";
-      const isXiaomi = model.brand.toLowerCase() === "xiaomi" || modelName.includes("redmi");
-      const isOnePlus = model.brand.toLowerCase() === "oneplus";
-      const isOppoVivo = ["oppo", "vivo", "realme"].includes(model.brand.toLowerCase());
-      const isHuawei = model.brand.toLowerCase() === "huawei";
-      const isTecnoInfinix = ["tecno", "infinix"].includes(model.brand.toLowerCase());
+      // Resolve this exact model's drawn geometry (body proportions + camera
+      // layout). Falls back to a brand/tier heuristic for admin-added models.
+      const shape = getPhoneShape(model.brand, model.name);
+      const left = (300 - shape.body.width) / 2;
+      const top = (440 - shape.body.height) / 2;
+      // Resize/re-center the shell only — the cover-color effect owns `fill`, so
+      // the chosen colour survives a model switch (the shell object persists).
+      shell.set({ left, top, width: shape.body.width, height: shape.body.height, rx: shape.body.rx, ry: shape.body.ry });
 
+      // Rebuild the camera cluster from the model's spec. Every part is placed
+      // relative to the shell's top-left, so it stays aligned at any body size.
       cameraParts.current.forEach((part) => canvas.remove(part));
       cameraParts.current = [];
       const addPart = (part: any) => { part.set({ selectable: false, evented: false }); cameraParts.current.push(part); canvas.add(part); };
-      const makeCircle = (left: number, top: number, radius: number) => new fabric.Circle({ left, top, radius, fill: "#1f2937", stroke: "#94a3b8", strokeWidth: 2 });
-
-    if (isIphone) {
-      shell.set({ left: 25, top: 15, width: 250, height: 410, rx: 34, ry: 34 });
-      addPart(new fabric.Rect({ left: 45, top: 36, width: 88, height: 92, rx: 21, ry: 21, fill: "#d1d5db" }));
-      addPart(makeCircle(57, 48, 15)); addPart(makeCircle(96, 48, 15)); addPart(makeCircle(57, 87, 15));
-      addPart(new fabric.Circle({ left: 102, top: 94, radius: 7, fill: "#f8fafc" }));
-    } else if (isPixel) {
-      shell.set({ left: 25, top: 15, width: 250, height: 410, rx: 30, ry: 30 });
-      addPart(new fabric.Rect({ left: 35, top: 55, width: 230, height: 40, rx: 12, ry: 12, fill: "#64748b" }));
-      addPart(makeCircle(65, 60, 14)); addPart(makeCircle(108, 60, 14));
-    } else if (isSamsung) {
-      shell.set({ left: 28, top: 12, width: 244, height: 416, rx: 20, ry: 20 });
-      addPart(makeCircle(55, 48, 18)); addPart(makeCircle(55, 98, 18)); addPart(makeCircle(55, 148, 18));
-      if (modelName.includes("ultra")) addPart(makeCircle(105, 48, 11));
-    } else if (isXiaomi) {
-      shell.set({ left: 27, top: 13, width: 246, height: 414, rx: 25, ry: 25 });
-      addPart(new fabric.Rect({ left: 43, top: 37, width: 93, height: 100, rx: 18, ry: 18, fill: "#334155" }));
-      addPart(makeCircle(57, 51, 17)); addPart(makeCircle(96, 51, 17)); addPart(makeCircle(57, 92, 17));
-    } else if (isOnePlus) {
-      shell.set({ left: 27, top: 12, width: 246, height: 416, rx: 28, ry: 28 });
-      addPart(new fabric.Circle({ left: 58, top: 43, radius: 40, fill: "#334155", stroke: "#94a3b8", strokeWidth: 2 }));
-      addPart(makeCircle(69, 54, 12)); addPart(makeCircle(101, 54, 12)); addPart(makeCircle(85, 82, 12));
-    } else if (isOppoVivo) {
-      shell.set({ left: 28, top: 12, width: 244, height: 416, rx: 24, ry: 24 });
-      addPart(new fabric.Rect({ left: 47, top: 42, width: 80, height: 118, rx: 21, ry: 21, fill: "#475569" }));
-      addPart(makeCircle(60, 55, 16)); addPart(makeCircle(60, 98, 16)); addPart(makeCircle(99, 55, 12));
-    } else if (isHuawei) {
-      shell.set({ left: 27, top: 12, width: 246, height: 416, rx: 28, ry: 28 });
-      addPart(new fabric.Circle({ left: 57, top: 39, radius: 43, fill: "#334155", stroke: "#94a3b8", strokeWidth: 2 }));
-      addPart(makeCircle(68, 50, 12)); addPart(makeCircle(102, 50, 12)); addPart(makeCircle(85, 79, 12));
-    } else if (isTecnoInfinix) {
-      shell.set({ left: 28, top: 12, width: 244, height: 416, rx: 23, ry: 23 });
-      addPart(new fabric.Rect({ left: 48, top: 40, width: 75, height: 125, rx: 20, ry: 20, fill: "#475569" }));
-      addPart(makeCircle(59, 52, 16)); addPart(makeCircle(59, 96, 16)); addPart(makeCircle(59, 140, 16));
-    } else {
-      shell.set({ left: 27, top: 14, width: 246, height: 412, rx: 24, ry: 24 });
-      addPart(new fabric.Rect({ left: 47, top: 42, width: 76, height: 88, rx: 18, ry: 18, fill: "#cbd5e1" }));
-      addPart(makeCircle(59, 54, 16)); addPart(makeCircle(93, 91, 16));
-    }
+      for (const part of shape.camera) {
+        if (part.kind === "rect") {
+          addPart(new fabric.Rect({ left: left + part.x, top: top + part.y, width: part.w, height: part.h, rx: part.r ?? 0, ry: part.r ?? 0, fill: part.fill ?? "#1f2937" }));
+        } else {
+          addPart(new fabric.Circle({ left: left + part.x, top: top + part.y, radius: part.radius, fill: part.fill ?? "#1f2937", stroke: part.stroke ?? "#94a3b8", strokeWidth: part.strokeWidth ?? 2 }));
+        }
+      }
       cameraParts.current.forEach((part) => canvas.bringObjectToFront(part));
       canvas.renderAll();
     });
@@ -208,7 +177,7 @@ export default function CustomCoverDesigner() {
     <div className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
       <section className="bg-white border rounded-xl p-3 shadow-sm sm:p-5"><div className="flex justify-center overflow-x-auto bg-gray-50 rounded-xl py-6"><canvas ref={htmlCanvasRef} aria-label="Custom cover design canvas" /></div><p className="text-center text-xs text-gray-500 mt-3">Select an item to move, resize, rotate, or change its layer.</p></section>
       <aside className="space-y-5">
-        <section className="bg-white border rounded-xl p-5 space-y-3"><h2 className="font-semibold">1. Choose your cover</h2><label className="block text-sm">Mobile model<select value={modelId} onChange={(e) => setModelId(e.target.value)} className="mt-1 w-full border rounded px-3 py-2">{Object.entries(catalog.reduce<Record<string, Catalog>>((groups, item) => ({ ...groups, [item.brand]: [...(groups[item.brand] || []), item] }), {})).map(([brand, models]) => <optgroup key={brand} label={brand}>{models.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</optgroup>)}</select></label><p className="text-xs text-gray-500">The preview changes its case outline and camera cutout for the selected phone family.</p><label className="block text-sm">Cover template<select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="mt-1 w-full border rounded px-3 py-2">{model?.templates.map((item) => <option value={item.id} key={item.id}>{item.name} — Rs. {(item.price / 100).toFixed(0)}</option>)}</select></label>{catalogError && <p className="text-sm text-red-500">{catalogError}</p>}</section>
+        <section className="bg-white border rounded-xl p-5 space-y-3"><h2 className="font-semibold">1. Choose your cover</h2><label className="block text-sm">Mobile model<select value={modelId} onChange={(e) => setModelId(e.target.value)} className="mt-1 w-full border rounded px-3 py-2">{Object.entries(catalog.reduce<Record<string, Catalog>>((groups, item) => ({ ...groups, [item.brand]: [...(groups[item.brand] || []), item] }), {})).map(([brand, models]) => <optgroup key={brand} label={brand}>{models.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</optgroup>)}</select></label><p className="text-xs text-gray-500">The preview changes its case outline and camera cutout for the selected phone.</p><label className="block text-sm">Cover template<select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="mt-1 w-full border rounded px-3 py-2">{model?.templates.map((item) => <option value={item.id} key={item.id}>{item.name} — Rs. {(item.price / 100).toFixed(0)}</option>)}</select></label>{catalogError && <p className="text-sm text-red-500">{catalogError}</p>}</section>
         <section className="bg-white border rounded-xl p-5 space-y-3"><h2 className="font-semibold">2. Personalize</h2><label className="block text-sm">Upload a photo<input type="file" accept="image/*" onChange={uploadImage} className="mt-1 block w-full text-sm" /></label><div className="flex gap-2"><input value={text} onChange={(e) => setText(e.target.value)} placeholder="Add a name or message" className="min-w-0 flex-1 border rounded px-3 py-2" /><button onClick={addText} className="bg-brand text-white px-3 rounded">Add</button></div><div className="flex gap-3 items-center"><input aria-label="Text color" type="color" value={fontColor} onChange={(e) => setFontColor(e.target.value)} /><input aria-label="Font size" type="range" min="14" max="64" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="flex-1" /><span className="text-xs">{fontSize}px</span></div><div className="flex gap-2">{["♥", "★", "☺", "✦"].map((emoji) => <button key={emoji} onClick={() => addEmoji(emoji)} className="border rounded px-3 py-1 hover:bg-gray-50">{emoji}</button>)}</div></section>
         <section className="bg-white border rounded-xl p-5 space-y-3"><h2 className="font-semibold">Cover color</h2><div className="flex flex-wrap gap-2">{coverColors.map((color) => <button key={color.name} title={color.name} onClick={() => setCoverColor(color)} className={`h-7 w-7 rounded-full border-2 ${coverColor.name === color.name ? "border-brand" : "border-white"}`} style={{ backgroundColor: color.hex }} />)}</div><label className="block text-sm">Custom HEX <input type="color" value={coverColor.hex} onChange={(e) => setCoverColor({ name: "Custom", hex: e.target.value })} /></label></section>
         <section className="bg-white border rounded-xl p-5 space-y-3"><h2 className="font-semibold">Advanced text</h2><div className="grid grid-cols-2 gap-2"><select value={fontFamily} onChange={(e) => { setFontFamily(e.target.value); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-2 py-2 text-sm">{["Poppins","Montserrat","Roboto","Inter","Pacifico","Dancing Script","Playfair Display","Great Vibes"].map((font) => <option key={font}>{font}</option>)}</select><select value={fontWeight} onChange={(e) => { setFontWeight(e.target.value); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-2 py-2 text-sm"><option value="normal">Regular</option><option value="bold">Bold</option></select></div><div className="flex gap-2"><button onClick={() => { setItalic(!italic); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-3 py-1 text-sm italic">Italic</button><button onClick={() => { setUnderline(!underline); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-3 py-1 text-sm underline">Underline</button><select value={textAlign} onChange={(e) => { setTextAlign(e.target.value); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-2 py-1 text-sm"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div><div className="grid grid-cols-2 gap-2 text-xs"><label>Letter spacing<input type="range" min="0" max="20" value={letterSpacing} onChange={(e) => { setLetterSpacing(Number(e.target.value)); setTimeout(() => applyTextSettings(), 0); }} className="w-full" /></label><label>Opacity<input type="range" min="10" max="100" value={textOpacity} onChange={(e) => { setTextOpacity(Number(e.target.value)); setTimeout(() => applyTextSettings(), 0); }} className="w-full" /></label></div><label className="text-xs">Text background <input type="color" value={textBackground} onChange={(e) => { setTextBackground(e.target.value); setTimeout(() => applyTextSettings(), 0); }} /></label><div className="flex flex-wrap gap-1">{Object.keys(presets).map((name) => <button key={name} onClick={() => { setStyleName(name); applyTextSettings(name); }} className="border rounded px-2 py-1 text-xs">{name}</button>)}</div><div className="flex flex-wrap gap-1">{["none", "shadow", "glow", "outline"].map((name) => <button key={name} onClick={() => { setEffect(name); setTimeout(() => applyTextSettings(), 0); }} className="border rounded px-2 py-1 text-xs capitalize">{name}</button>)}</div></section>

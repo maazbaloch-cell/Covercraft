@@ -186,7 +186,7 @@ function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta
           fading to fully transparent at top & bottom. Because adjacent scenes
           meet at transparent edges, two scrims never stack into a dark seam
           line — the worlds blend into the one shared canvas behind them. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-ink-950/40 to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-ink-950/25 to-transparent" />
 
       <div className="mx-auto grid w-full max-w-[var(--cinema-max)] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-8">
         {/* Copy */}
@@ -271,8 +271,8 @@ function WorldPhone({ world }: { world: World }) {
 // Fade every world's art to transparent at the top & bottom of its scene so it
 // melts into the continuous canvas above and below it.
 const EDGE_FADE = {
-  maskImage: "linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent)",
-  WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent)",
+  maskImage: "linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent)",
+  WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent)",
 } as const;
 
 function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {

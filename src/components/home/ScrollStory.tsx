@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import { cinematicReveal, viewportOnce } from "@/lib/motion";
 import { IphoneFrame, PhoneBackSurface, CoverSkin } from "./DevicePhone";
 import Phone3D from "./Phone3D";
@@ -59,28 +59,34 @@ export default function ScrollStory() {
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
 
+  // Smooth the raw scroll signal with a spring so the pinned sequence glides
+  // instead of snapping 1:1 to every scroll delta. Stiffness is kept high (and
+  // mass low) so the phone still tracks the finger closely — enough inertia to
+  // feel silky, not so much that the device visibly lags behind the scrollbar.
+  const progress = useSpring(scrollYProgress, { stiffness: 130, damping: 30, mass: 0.35 });
+
   // Camera push — a CSS "dolly" that scales the 3D phone's container so the
   // camera appears to move toward the product, then settles. The phone's own
   // yaw and the case peel are driven in-scene by the MotionValues below.
-  const deviceScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.82, 1.06, 1.0]);
+  const deviceScale = useTransform(progress, [0, 0.35, 1], [0.82, 1.06, 1.0]);
 
   // Cover separation (0→1) + a gentle yaw orbit, fed straight into Phone3D. The
   // 3D case is a real extruded shell with a camera cutout, so it lifts off with
   // visible thickness, inner walls and a shadow onto the body — not a sticker.
-  const sep = useTransform(scrollYProgress, [0.35, 0.72], [0, 1]);
-  const spin = useTransform(scrollYProgress, [0, 1], [0, 0.9]);
+  const sep = useTransform(progress, [0.35, 0.72], [0, 1]);
+  const spin = useTransform(progress, [0, 1], [0, 0.9]);
 
   // The engineering beneath is revealed as the shell leaves.
-  const bodyGlow = useTransform(scrollYProgress, [0.35, 0.7], [0.15, 0.6]);
-  const hintOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+  const bodyGlow = useTransform(progress, [0.35, 0.7], [0.15, 0.6]);
+  const hintOpacity = useTransform(progress, [0, 0.12], [1, 0]);
 
   // Three narrative panels cross-fade in step with the mechanics.
-  const p0Opacity = useTransform(scrollYProgress, [0, 0.04, 0.24, 0.32], [0, 1, 1, 0]);
-  const p0Y = useTransform(scrollYProgress, [0, 0.32], [0, -24]);
-  const p1Opacity = useTransform(scrollYProgress, [0.34, 0.42, 0.58, 0.66], [0, 1, 1, 0]);
-  const p1Y = useTransform(scrollYProgress, [0.34, 0.66], [28, -24]);
-  const p2Opacity = useTransform(scrollYProgress, [0.68, 0.78, 1], [0, 1, 1]);
-  const p2Y = useTransform(scrollYProgress, [0.68, 0.86], [28, 0]);
+  const p0Opacity = useTransform(progress, [0, 0.04, 0.24, 0.32], [0, 1, 1, 0]);
+  const p0Y = useTransform(progress, [0, 0.32], [0, -24]);
+  const p1Opacity = useTransform(progress, [0.34, 0.42, 0.58, 0.66], [0, 1, 1, 0]);
+  const p1Y = useTransform(progress, [0.34, 0.66], [28, -24]);
+  const p2Opacity = useTransform(progress, [0.68, 0.78, 1], [0, 1, 1]);
+  const p2Y = useTransform(progress, [0.68, 0.86], [28, 0]);
 
   // ----- Reduced-motion / no-JS-friendly fallback: a static "exploded" view. -----
   if (reduce) {
@@ -185,11 +191,6 @@ export default function ScrollStory() {
               <Phone3D skin="cover" separation={sep} spin={spin} className="h-full w-full" />
             </motion.div>
           </div>
-        </div>
-
-        {/* film scrubber */}
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-white/10">
-          <motion.div style={{ scaleX: scrollYProgress }} className="h-full origin-left bg-accent-500" />
         </div>
       </div>
     </section>

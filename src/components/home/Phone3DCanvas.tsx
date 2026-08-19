@@ -160,14 +160,18 @@ function PhoneModel({ skin, idle, separation, spin, baseYaw, reduce }: ModelProp
       root.current.rotation.y = yaw;
       root.current.rotation.x = (idle && !reduce ? Math.sin(t * 0.24) * 0.05 : 0) + sep * 0.12;
       root.current.position.y = idle && !reduce ? Math.sin(t * 0.5) * 0.06 : 0;
+      // Gentle group dolly-out as the case peels, so the lifted shell's top/right
+      // corners stay inside the (narrow-fov) frustum instead of being clipped.
+      root.current.scale.setScalar(1 - sep * 0.1);
     }
     if (caseGroup.current) {
       // Case lifts toward the viewer (+z = real depth) and floats up, tilting so
       // its inner side walls and the camera-cutout rim read as a genuine, thick
-      // physical shell peeling off — never a flat sticker that just fades.
-      caseGroup.current.position.z = sep * 1.2;
-      caseGroup.current.position.y = sep * 0.52;
-      caseGroup.current.position.x = sep * 0.3;
+      // physical shell peeling off — never a flat sticker that just fades. Travel
+      // is tuned to stay within the canvas frame at full separation (no corner clip).
+      caseGroup.current.position.z = sep * 1.0;
+      caseGroup.current.position.y = sep * 0.42;
+      caseGroup.current.position.x = sep * 0.22;
       caseGroup.current.rotation.x = sep * 0.42;
       caseGroup.current.rotation.y = sep * 0.5;
       caseGroup.current.rotation.z = sep * -0.2;
@@ -284,7 +288,7 @@ export default function Phone3DCanvas({ skin, idle, separation, spin, baseYaw = 
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{ position: [0, 0, 8], fov: 26 }}
+      camera={{ position: [0, 0, 9.5], fov: 26 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       frameloop={inView ? "always" : "never"}
       style={{ background: "transparent" }}
