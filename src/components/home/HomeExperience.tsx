@@ -8,6 +8,7 @@ import type { CatalogProduct } from "@/components/ShopCatalog";
 import { resolveProductImage } from "@/lib/productImage";
 import ScrollStory from "./ScrollStory";
 import CoverWorlds from "./CoverWorlds";
+import Phone3D from "./Phone3D";
 import {
   EASE_CINEMATIC,
   EASE_OUT_EXPO,
@@ -36,12 +37,26 @@ import {
 export default function HomeExperience({ featured }: { featured: CatalogProduct[] }) {
   return (
     <div className="cinematic-scene relative isolate overflow-x-clip">
-      {/* Ambient cinematic backdrop */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-aurora animate-aurora-drift" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.12] mix-blend-soft-light" />
+      {/* ONE continuous, viewport-fixed cinematic environment. Because it is
+          fixed (not per-section), the whole page shares a single atmosphere —
+          there are no section backgrounds to create horizontal seams or boxes.
+          Individual scenes layer their own soft, edge-fading tints ON TOP of
+          this, so colour evolves gradually as you scroll. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-ink-950" />
+        <div className="absolute inset-0 bg-aurora animate-aurora-drift" />
+        {/* large, soft, blurred light sources — depth + gentle colour drift */}
+        <div className="absolute -left-[15%] top-[-10%] h-[75vmax] w-[75vmax] rounded-full bg-accent-700/20 blur-[150px]" />
+        <div className="absolute right-[-10%] top-[25%] h-[60vmax] w-[60vmax] rounded-full bg-accent-500/12 blur-[160px]" />
+        <div className="absolute bottom-[-15%] left-[20%] h-[65vmax] w-[65vmax] rounded-full bg-cover-600/10 blur-[170px]" />
+        {/* faint top-of-frame brand light + edge vignette so the frame focuses inward */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(120% 70% at 50% -10%, rgba(37,99,235,0.16), transparent 55%)" }} />
+        <div className="vignette absolute inset-0" />
+        <div className="absolute inset-0 bg-grain opacity-[0.10] mix-blend-soft-light" />
+      </div>
 
       <Hero cover={featured[0]} />
-      <ScrollStory cover={featured[0]} />
+      <ScrollStory />
       <CoverWorlds />
       {featured.length > 0 && <Featured products={featured} />}
       <Closing />
@@ -250,15 +265,21 @@ function FeaturedCard({ product }: { product: CatalogProduct }) {
  * ------------------------------------------------------------------ */
 function Closing() {
   return (
-    <section className="relative mx-auto w-full max-w-[var(--cinema-max)] px-6 pb-28 pt-8">
+    <section className="relative mx-auto w-full max-w-[var(--cinema-max)] px-6 pb-32 pt-12 sm:pb-40">
       <motion.div
         variants={blurIn}
         initial="hidden"
         whileInView="show"
         viewport={viewportOnce}
-        className="glow-ring relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-ink-700 to-ink-900 px-8 py-16 text-center sm:py-20"
+        className="relative px-6 py-20 text-center sm:py-28"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-aurora opacity-60" />
+        {/* Soft pool of brand light — no border, no solid fill, so the CTA reads
+            as a lit region of the continuous canvas rather than a boxed card. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[130%] w-[120%] -translate-x-1/2 -translate-y-1/2"
+          style={{ background: "radial-gradient(closest-side, rgba(37,99,235,0.18), rgba(37,99,235,0.06) 55%, transparent 80%)" }}
+        />
         <div className="relative">
           <h2 className="mx-auto max-w-2xl font-display text-4xl font-bold leading-tight tracking-cinema text-white sm:text-5xl">
             Ready to dress your phone?
@@ -309,40 +330,18 @@ function Dot() {
 }
 
 /**
- * PhoneMock — a CSS/DOM rendering of a phone shown from the back, so the cover
- * (the product) is the hero. Uses a real product image when available, else a
- * gradient. No external assets required.
+ * PhoneMock — the hero device: a realistic iPhone-Pro-Max-style flagship shown
+ * from the back wearing a premium ORANGE case, now rendered as a real WebGL
+ * object (Phone3D) with a gentle idle float + auto-rotate. Falls back to the CSS
+ * device where WebGL/motion is unavailable.
  */
-function PhoneMock({ cover, float = false }: { cover?: CatalogProduct; float?: boolean }) {
-  const [failed, setFailed] = useState(false);
-  const src = cover ? resolveProductImage(cover.imageUrl, failed) : null;
+function PhoneMock({ float = false }: { cover?: CatalogProduct; float?: boolean }) {
   return (
-    <motion.div
-      animate={float ? { y: [0, -14, 0] } : undefined}
-      transition={float ? { duration: 6.5, ease: "easeInOut", repeat: Infinity } : undefined}
-      className="relative h-[520px] w-[260px] rounded-[2.75rem] border border-white/15 bg-gradient-to-b from-white/10 to-white/[0.02] p-2.5 shadow-depth-lg"
-    >
-      {/* Cover surface */}
-      <div className="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-ink-800">
-        {src ? (
-          <Image src={src} alt={cover?.title ?? "Featured cover"} fill sizes="260px" className="object-cover" onError={() => setFailed(true)} priority />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-accent-500 via-accent-700 to-ink-900" />
-        )}
-        {/* Sheen */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent" />
-        {/* Camera module */}
-        <div className="absolute left-4 top-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/15 bg-black/40 backdrop-blur-sm">
-          <div className="grid grid-cols-2 gap-1.5">
-            <span className="h-6 w-6 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-6 w-6 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-6 w-6 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-6 w-6 rounded-full bg-accent-500/40 ring-2 ring-white/10" />
-          </div>
-        </div>
-        {/* Etched wordmark */}
-        <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.3em] text-white/50">CoverCraft</span>
-      </div>
-    </motion.div>
+    <Phone3D
+      idle={float}
+      glow
+      skin="cover"
+      className="h-[500px] w-[244px] sm:h-[560px] sm:w-[272px]"
+    />
   );
 }

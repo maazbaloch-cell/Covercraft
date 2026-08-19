@@ -244,7 +244,7 @@ function PhoneStage({ cover, isSignup, reduce }: { cover: number; isSignup: bool
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Rim highlight. */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[2.6rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),inset_0_0_28px_rgba(124,58,237,0.28)]" />
+          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[2.6rem] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),inset_0_0_28px_rgba(37,99,235,0.28)]" />
           {/* Screen — cycles real cover art. */}
           <div className="relative h-full w-full overflow-hidden rounded-[2.15rem] bg-ink-950">
             <AnimatePresence>

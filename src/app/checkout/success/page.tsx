@@ -9,12 +9,12 @@ import { DUR, EASE_OUT_EXPO, fadeInUp, staggerContainer } from "@/lib/motion";
 
 // Deterministic "confetti-lite" burst (no randomness → no SSR hydration mismatch).
 const CONFETTI = [
-  { x: -64, y: -26, c: "#7c3aed", d: 0.30 },
+  { x: -64, y: -26, c: "#2563eb", d: 0.30 },
   { x: 66, y: -34, c: "#f59e0b", d: 0.34 },
   { x: -40, y: -66, c: "#10b981", d: 0.38 },
   { x: 44, y: -64, c: "#0ea5e9", d: 0.30 },
   { x: -78, y: 16, c: "#ec4899", d: 0.42 },
-  { x: 80, y: 10, c: "#8b5cf6", d: 0.36 },
+  { x: 80, y: 10, c: "#3b82f6", d: 0.36 },
   { x: -20, y: -84, c: "#f43f5e", d: 0.46 },
   { x: 24, y: -82, c: "#22c55e", d: 0.40 },
 ];
@@ -29,7 +29,7 @@ function SuccessContent() {
   }, [clear]);
 
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center sm:py-24">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="util-dark mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center sm:py-24">
       <motion.div variants={fadeInUp} className="relative">
         {/* Confetti-lite burst around the checkmark */}
         {CONFETTI.map((p, idx) => (
@@ -65,7 +65,7 @@ function SuccessContent() {
       </motion.p>
       <motion.div variants={fadeInUp} className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
         {orderNumber && (
-          <Link href={`/track?order=${orderNumber}`} className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700">
+          <Link href={`/track?order=${orderNumber}`} className="rounded-xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-700">
             Track your order →
           </Link>
         )}
@@ -78,5 +78,5 @@ function SuccessContent() {
 }
 
 export default function SuccessPage() {
-  return <Suspense fallback={<div className="mx-auto max-w-lg px-6 py-20 text-center text-slate-500">Loading confirmation…</div>}><SuccessContent /></Suspense>;
+  return <Suspense fallback={<div className="util-dark mx-auto min-h-[60vh] max-w-lg px-6 py-20 text-center text-slate-400">Loading confirmation…</div>}><SuccessContent /></Suspense>;
 }

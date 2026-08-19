@@ -62,7 +62,7 @@ export default function ProductCard({ id, title, price, imageUrl, category, bran
       viewport={viewportOnce}
       transition={{ duration: DUR.section, ease: EASE_OUT_EXPO, delay: (index % 5) * 0.05 }}
       whileHover={{ y: -6, rotate: -0.6 }}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_2px_10px_rgb(15_23_42_/_0.04)] transition-[box-shadow,border-color] duration-300 hover:border-accent-300 hover:shadow-[0_22px_48px_-16px_rgb(109_40_217_/_0.30)]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_2px_10px_rgb(15_23_42_/_0.04)] transition-[box-shadow,border-color] duration-300 hover:border-accent-300 hover:shadow-[0_22px_48px_-16px_rgb(37_99_235_/_0.30)]"
     >
       <div ref={imageRef} className="relative aspect-[4/4.35] overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200/60">
         <Link href={href} aria-label={`View ${title}`} onClick={captureFlip}>

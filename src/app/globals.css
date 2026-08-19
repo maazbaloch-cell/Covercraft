@@ -9,16 +9,20 @@
  * light theme used by the utility surfaces (cart / admin / designer).
  * ------------------------------------------------------------------ */
 :root {
-  --ink-950: #050609;
-  --ink-900: #0a0b12;
-  --ink-850: #0d0f19;
-  --ink-800: #111320;
-  --ink-700: #171a2b;
-  --accent-300: #c4b5fd;
-  --accent-400: #a78bfa;
-  --accent-500: #8b5cf6;
-  --accent-600: #7c3aed;
-  --accent-700: #6d28d9;
+  --ink-950: #04060d;
+  --ink-900: #070b16;
+  --ink-850: #0a0f1d;
+  --ink-800: #0e1424;
+  --ink-700: #141b30;
+  --accent-300: #93c5fd;
+  --accent-400: #60a5fa;
+  --accent-500: #3b82f6;
+  --accent-600: #2563eb;
+  --accent-700: #1d4ed8;
+  /* Product/cover warm accent — hero phone case & product art only, never UI chrome. */
+  --cover-400: #fb923c;
+  --cover-500: #f97316;
+  --cover-600: #ea580c;
   --cinema-radius: 1.5rem;
   --cinema-max: 80rem;
 }
@@ -61,7 +65,7 @@
     text-rendering: optimizeLegibility;
   }
   input, textarea, select { transition: border-color .18s ease, box-shadow .18s ease; }
-  input:focus, textarea:focus, select:focus { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px rgb(139 92 246 / .14); outline: none; }
+  input:focus, textarea:focus, select:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgb(59 130 246 / .16); outline: none; }
   button, a { -webkit-tap-highlight-color: transparent; }
   /* Visible keyboard-focus ring for interactive elements (WCAG 2.4.7 Focus Visible).
      Only :focus-visible, so mouse/touch activation stays ring-free; inputs keep their
@@ -73,8 +77,8 @@
 }
 
 @layer components {
-  .design-studio > div:first-child { border-radius: 1.5rem; padding: 2rem; color: white; background: radial-gradient(circle at top right, rgb(139 92 246 / .65), transparent 36%), #0f172a; }
-  .design-studio > div:first-child p { color: #c4b5fd !important; }
+  .design-studio > div:first-child { border-radius: 1.5rem; padding: 2rem; color: white; background: radial-gradient(circle at top right, rgb(37 99 235 / .6), transparent 40%), #0b1120; }
+  .design-studio > div:first-child p { color: #93c5fd !important; }
   .design-studio > div:first-child h1 { font-weight: 900; letter-spacing: -.04em; }
   .design-studio section { border-color: #e2e8f0 !important; border-radius: 1.25rem !important; box-shadow: 0 8px 22px rgb(15 23 42 / .05); }
   .design-studio aside { position: sticky; top: 5.5rem; }
@@ -85,17 +89,17 @@
   .design-studio select, .design-studio input:not([type="color"]), .design-studio textarea { border-color: #cbd5e1 !important; border-radius: .7rem !important; }
   .design-studio canvas { filter: drop-shadow(0 16px 14px rgb(15 23 42 / .18)); }
   .admin-dashboard > h1 { font-size: 2rem; font-weight: 900; letter-spacing: -.045em; color: #0f172a; }
-  .admin-dashboard > h1::before { content: "Operations center"; display: block; margin-bottom: .45rem; color: #7c3aed; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .admin-dashboard > h1::before { content: "Operations center"; display: block; margin-bottom: .45rem; color: #60a5fa; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
   .admin-dashboard .bg-white { border-color: #e2e8f0 !important; border-radius: 1.25rem !important; box-shadow: 0 7px 18px rgb(15 23 42 / .04); }
-  .admin-dashboard > .grid > div { position: relative; overflow: hidden; border: 0 !important; background: #0f172a; color: white; }
-  .admin-dashboard > .grid > div:nth-child(2) { background: linear-gradient(135deg,#6d28d9,#4f46e5); }
+  .admin-dashboard > .grid > div { position: relative; overflow: hidden; border: 0 !important; background: #0b1120; color: white; }
+  .admin-dashboard > .grid > div:nth-child(2) { background: linear-gradient(135deg,#1d4ed8,#2563eb); }
   .admin-dashboard > .grid > div p:first-child { color: #cbd5e1; }
   .admin-dashboard button { border-radius: .65rem; font-weight: 700; transition: transform .16s ease, box-shadow .16s ease; }
   .admin-dashboard button:hover { transform: translateY(-1px); }
   .admin-dashboard input, .admin-dashboard select { border-color: #cbd5e1 !important; border-radius: .65rem !important; }
   .admin-dashboard h2 { color: #0f172a; font-weight: 800; }
   .premium-cart > h1 { font-weight: 900; letter-spacing: -.04em; color: #0f172a; }
-  .premium-cart > h1::before { content: "Checkout"; display: block; margin-bottom: .35rem; color: #7c3aed; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .premium-cart > h1::before { content: "Checkout"; display: block; margin-bottom: .35rem; color: #2563eb; font-size: .68rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
   .premium-cart .bg-white { border-color: #e2e8f0 !important; border-radius: 1rem !important; box-shadow: 0 8px 20px rgb(15 23 42 / .05); }
   .premium-cart input { border-color: #cbd5e1 !important; border-radius: .7rem !important; }
 }
@@ -105,12 +109,12 @@
  * add these classes; existing utility pages are unaffected.
  * ------------------------------------------------------------------ */
 @layer components {
-  /* Deep cinematic canvas: dark base + faint accent light. Pages/sections opt in. */
+  /* Deep cinematic canvas: dark base + faint brand-blue light. Pages/sections opt in. */
   .cinematic-scene {
     background:
-      radial-gradient(120% 80% at 50% -10%, rgb(124 58 237 / .16), transparent 55%),
+      radial-gradient(120% 80% at 50% -10%, rgb(37 99 235 / .18), transparent 55%),
       var(--ink-950);
-    color: #e7e9f3;
+    color: #e8edf9;
   }
   /* Frosted panel for use on dark scenes. */
   .glass {
@@ -122,9 +126,9 @@
 }
 
 @layer utilities {
-  /* Gradient display text — clip a violet gradient to the glyphs. */
+  /* Gradient display text — clip a brand-blue gradient to the glyphs. */
   .text-gradient {
-    background-image: linear-gradient(100deg, #ffffff 0%, #c4b5fd 55%, #8b5cf6 100%);
+    background-image: linear-gradient(100deg, #ffffff 0%, #93c5fd 55%, #3b82f6 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -137,10 +141,128 @@
   .vignette {
     box-shadow: inset 0 0 180px 40px rgb(5 6 9 / .9);
   }
-  /* Accent glow ring for hero products / focal objects. */
+  /* Accent glow ring for hero products / focal objects — brand blue. */
   .glow-ring {
-    box-shadow: 0 0 44px -8px rgb(124 58 237 / .55), 0 0 120px -30px rgb(124 58 237 / .5);
+    box-shadow: 0 0 44px -8px rgb(37 99 235 / .55), 0 0 120px -30px rgb(37 99 235 / .5);
   }
   /* GPU hint for elements that will be scroll/transform animated. */
   .will-cinema { will-change: transform, opacity; }
 }
+
+/* ------------------------------------------------------------------ *
+ * Admin dashboard — brand-dark retheme. The dashboard markup was built
+ * for a light body (white cards, gray text, near-black `brand` buttons),
+ * which left it looking like a separate product from the dark cinematic
+ * chrome around it. These rules are UNLAYERED (so they win over Tailwind's
+ * utilities layer without touching the JSX/logic) and scoped to the
+ * existing `.admin-dashboard` wrapper, so no other page is affected.
+ * ------------------------------------------------------------------ */
+/* Full-bleed dark canvas behind the (centred) dashboard so there are no
+   light gutters and it melts into the dark header/footer — one continuous
+   environment. Fixed + z-index:-1 keeps it behind content, above body bg. */
+.admin-dashboard::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgb(37 99 235 / .18), transparent 55%),
+    var(--ink-950);
+}
+.admin-dashboard { color: #e8edf9; }
+.admin-dashboard > h1 { color: #ffffff; }
+.admin-dashboard h2 { color: #ffffff; }
+.admin-dashboard .text-gray-400 { color: #64748b !important; }
+.admin-dashboard .text-gray-500 { color: #94a3b8 !important; }
+.admin-dashboard .text-gray-600 { color: #cbd5e1 !important; }
+/* generic 1px borders → subtle light hairlines (skips `border-brand`) */
+.admin-dashboard [class~="border"],
+.admin-dashboard [class~="border-t"],
+.admin-dashboard [class~="border-dashed"],
+.admin-dashboard .border-slate-200 { border-color: rgb(255 255 255 / .10); }
+/* white section cards + skeletons → frosted dark glass */
+.admin-dashboard .bg-white {
+  background: rgb(255 255 255 / .04) !important;
+  border-color: rgb(255 255 255 / .10) !important;
+  box-shadow: 0 22px 48px -30px rgb(0 0 0 / .8) !important;
+  color: #e8edf9;
+}
+/* the two hero stat tiles stay solid/gradient so they read as focal */
+.admin-dashboard .grid > .bg-white { background: #0b1120 !important; border: 0 !important; color: #fff; }
+.admin-dashboard .grid > .bg-white:nth-child(2) { background: linear-gradient(135deg, #1d4ed8, #2563eb) !important; }
+.admin-dashboard .bg-gray-50 { background-color: rgb(255 255 255 / .04) !important; color: #cbd5e1; }
+/* form controls → dark fields */
+.admin-dashboard input,
+.admin-dashboard select,
+.admin-dashboard textarea {
+  background-color: rgb(255 255 255 / .05) !important;
+  border-color: rgb(255 255 255 / .12) !important;
+  color: #e8edf9 !important;
+  color-scheme: dark;
+}
+.admin-dashboard input::placeholder,
+.admin-dashboard textarea::placeholder { color: #64748b; }
+/* near-black `brand` buttons → brand blue */
+.admin-dashboard .bg-brand { background-color: var(--accent-600) !important; color: #fff !important; }
+.admin-dashboard .hover\:bg-brand-accent:hover { background-color: var(--accent-500) !important; }
+.admin-dashboard .border-brand { border-color: var(--accent-500) !important; }
+.admin-dashboard .text-brand { color: var(--accent-300) !important; }
+.admin-dashboard .text-brand-accent { color: var(--accent-300) !important; }
+.admin-dashboard .hover\:bg-brand:hover { background-color: var(--accent-600) !important; }
+.admin-dashboard .hover\:bg-slate-50:hover { background-color: rgb(255 255 255 / .05) !important; }
+.admin-dashboard .hover\:border-brand\/40:hover { border-color: rgb(37 99 235 / .45) !important; }
+
+/* ------------------------------------------------------------------ *
+ * Utility pages — brand-dark retheme. Cart, Track, Support, Wishlist,
+ * Account dashboard, Checkout result and the Customization studio were
+ * built for the light body, leaving dark-header / light-body / dark-footer
+ * banding. `.util-dark` (added to each page's root) gives them the same
+ * full-bleed dark canvas + retinted surfaces as the rest of the site.
+ * Unlayered + scoped so no JSX/logic changes and no other page is touched;
+ * !important beats the layered light rules on .premium-cart / .design-studio.
+ * Semantic status tints (emerald / rose / amber) are intentionally kept.
+ * ------------------------------------------------------------------ */
+.util-dark::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgb(37 99 235 / .18), transparent 55%),
+    var(--ink-950);
+}
+.util-dark { color: #e8edf9; }
+.util-dark h1, .util-dark h2, .util-dark h3 { color: #ffffff; }
+.util-dark .text-slate-950, .util-dark .text-slate-900, .util-dark .text-slate-800 { color: #e8edf9 !important; }
+.util-dark .text-slate-700, .util-dark .text-slate-600, .util-dark .text-slate-500, .util-dark .text-slate-400,
+.util-dark .text-gray-600, .util-dark .text-gray-500, .util-dark .text-gray-400 { color: #94a3b8 !important; }
+.util-dark .text-brand, .util-dark .text-brand-accent { color: var(--accent-300) !important; }
+/* surfaces → frosted dark glass */
+.util-dark .bg-white {
+  background: rgb(255 255 255 / .04) !important;
+  border-color: rgb(255 255 255 / .10) !important;
+  box-shadow: 0 22px 48px -30px rgb(0 0 0 / .8) !important;
+  color: #e8edf9;
+}
+.util-dark .bg-slate-50, .util-dark .bg-gray-50, .util-dark .bg-slate-100, .util-dark .bg-gray-100 { background-color: rgb(255 255 255 / .04) !important; color: #e8edf9; }
+.util-dark .bg-slate-200 { background-color: rgb(255 255 255 / .08) !important; }
+.util-dark .bg-blue-100 { background-color: rgb(37 99 235 / .18) !important; color: var(--accent-300) !important; }
+.util-dark .hover\:bg-slate-100:hover, .util-dark .hover\:bg-slate-50:hover { background-color: rgb(255 255 255 / .06) !important; }
+/* generic + slate borders → subtle light hairlines (also beats layered !important) */
+.util-dark [class~="border"], .util-dark [class~="border-t"], .util-dark [class~="border-b"], .util-dark [class~="border-dashed"],
+.util-dark .border-slate-200, .util-dark .border-slate-300, .util-dark .border-slate-100,
+.util-dark section { border-color: rgb(255 255 255 / .12) !important; }
+/* form controls → dark fields */
+.util-dark input, .util-dark select, .util-dark textarea {
+  background-color: rgb(255 255 255 / .05) !important;
+  border-color: rgb(255 255 255 / .14) !important;
+  color: #e8edf9 !important;
+  color-scheme: dark;
+}
+.util-dark input::placeholder, .util-dark textarea::placeholder { color: #64748b; }
+.util-dark .disabled\:bg-gray-100:disabled, .util-dark .disabled\:bg-slate-50:disabled { background-color: rgb(255 255 255 / .03) !important; }
+.util-dark .disabled\:text-gray-500:disabled { color: #64748b !important; }
+/* near-black `brand` / slate-950 buttons + panels → brand blue */
+.util-dark .bg-brand, .util-dark .bg-slate-950 { background-color: var(--accent-600) !important; color: #fff !important; }
+.util-dark .hover\:bg-brand-accent:hover { background-color: var(--accent-500) !important; }
+.util-dark .border-brand { border-color: var(--accent-500) !important; }

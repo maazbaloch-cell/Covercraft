@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import type { CatalogProduct } from "@/components/ShopCatalog";
-import { resolveProductImage } from "@/lib/productImage";
 import { cinematicReveal, viewportOnce } from "@/lib/motion";
+import { IphoneFrame, PhoneBackSurface, CoverSkin } from "./DevicePhone";
+import Phone3D from "./Phone3D";
 
 /**
  * ScrollStory — the "ENTER the product" scene (Phase 4).
@@ -46,7 +45,7 @@ const STAGES = [
 
 const SPECS = ["1.2 m drop-tested", "1.9 mm slim", "Qi wireless-ready", "Raised camera lip"] as const;
 
-export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
+export default function ScrollStory() {
   const reduceRaw = useReducedMotion();
   // Defer the reduced-motion branch until after mount. useReducedMotion() reads
   // matchMedia (client-only): branching the returned tree on it at render time
@@ -60,15 +59,16 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
 
-  // Camera push — the whole device eases in, then settles.
+  // Camera push — a CSS "dolly" that scales the 3D phone's container so the
+  // camera appears to move toward the product, then settles. The phone's own
+  // yaw and the case peel are driven in-scene by the MotionValues below.
   const deviceScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.82, 1.06, 1.0]);
-  const deviceRotate = useTransform(scrollYProgress, [0, 1], [-3, 4]);
 
-  // Cover separation — the printed shell lifts off, drifts and tilts away.
-  const shellY = useTransform(scrollYProgress, [0.35, 0.72], [0, -130]);
-  const shellX = useTransform(scrollYProgress, [0.35, 0.72], [0, 64]);
-  const shellRotate = useTransform(scrollYProgress, [0.35, 0.74], [0, 12]);
-  const shellScale = useTransform(scrollYProgress, [0.35, 0.72], [1, 1.05]);
+  // Cover separation (0→1) + a gentle yaw orbit, fed straight into Phone3D. The
+  // 3D case is a real extruded shell with a camera cutout, so it lifts off with
+  // visible thickness, inner walls and a shadow onto the body — not a sticker.
+  const sep = useTransform(scrollYProgress, [0.35, 0.72], [0, 1]);
+  const spin = useTransform(scrollYProgress, [0, 1], [0, 0.9]);
 
   // The engineering beneath is revealed as the shell leaves.
   const bodyGlow = useTransform(scrollYProgress, [0.35, 0.7], [0.15, 0.6]);
@@ -94,14 +94,14 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
         <div className="mt-14 grid items-center gap-12 lg:grid-cols-2">
           {/* Static exploded device */}
           <div className="flex justify-center">
-            <div className="relative h-[420px] w-[210px]">
-              <DeviceChassis>
-                <PhoneBackFace />
-                {/* Cover offset up-and-out to imply the exploded/separated view */}
-                <div className="absolute inset-0 -translate-y-6 translate-x-4 rotate-6">
-                  <CoverArtFace cover={cover} />
+            <div className="relative h-[440px] w-[214px]">
+              <IphoneFrame className="h-full w-full">
+                <PhoneBackSurface />
+                {/* Case offset up-and-out to imply the exploded/separated view */}
+                <div className="absolute inset-0 -translate-y-8 translate-x-5 rotate-6">
+                  <CoverSkin variant="cover" />
                 </div>
-              </DeviceChassis>
+              </IphoneFrame>
             </div>
           </div>
 
@@ -175,17 +175,14 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
               Scroll to open
             </motion.span>
 
-            <motion.div style={{ scale: deviceScale, rotate: deviceRotate }} className="will-cinema relative h-[300px] w-[150px] sm:h-[460px] sm:w-[230px]">
+            <motion.div style={{ scale: deviceScale }} className="will-cinema relative h-[360px] w-[200px] sm:h-[520px] sm:w-[300px]">
               {/* growing ambient light behind the revealed body */}
-              <motion.div style={{ opacity: bodyGlow }} aria-hidden className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-accent-600/35 blur-3xl" />
+              <motion.div style={{ opacity: bodyGlow }} aria-hidden className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-cover-500/30 blur-3xl" />
 
-              <DeviceChassis>
-                <PhoneBackFace />
-                {/* the printed cover, which lifts away */}
-                <motion.div style={{ y: shellY, x: shellX, rotate: shellRotate, scale: shellScale }} className="will-cinema absolute inset-0">
-                  <CoverArtFace cover={cover} />
-                </motion.div>
-              </DeviceChassis>
+              {/* The real WebGL device: the titanium body + camera module stay put
+                  while the orange case — a physical shell with a real camera
+                  cutout — lifts off, driven by `sep`; `spin` gently orbits it. */}
+              <Phone3D skin="cover" separation={sep} spin={spin} className="h-full w-full" />
             </motion.div>
           </div>
         </div>
@@ -200,56 +197,9 @@ export default function ScrollStory({ cover }: { cover?: CatalogProduct }) {
 }
 
 /* ------------------------------------------------------------------ *
- * Pieces shared by the animated and reduced-motion paths.
+ * The device (titanium frame, bare back + camera, and the removable orange
+ * case) now lives in ./DevicePhone and is shared by every home scene.
  * ------------------------------------------------------------------ */
-
-/** The phone chassis (outer frame). Children are the stacked back + cover. */
-function DeviceChassis({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative h-full w-full rounded-[2.4rem] border border-white/15 bg-gradient-to-b from-white/10 to-white/[0.02] p-2.5 shadow-depth-lg">
-      <div className="relative h-full w-full">{children}</div>
-    </div>
-  );
-}
-
-/** The phone's back, revealed once the cover lifts away. */
-function PhoneBackFace() {
-  return (
-    <div className="absolute inset-0 overflow-hidden rounded-[1.9rem] border border-white/10 bg-gradient-to-b from-ink-700 via-ink-800 to-ink-950">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.06] to-transparent" />
-      {/* real camera module */}
-      <div className="absolute left-4 top-4 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-2xl border border-white/12 bg-black/50">
-        <div className="grid grid-cols-2 gap-1.5">
-          <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-          <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-          <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-          <span className="h-5 w-5 rounded-full bg-accent-500/50 ring-2 ring-white/10" />
-        </div>
-      </div>
-      <span className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[9px] font-semibold uppercase tracking-[0.3em] text-white/30">Engineered inside</span>
-    </div>
-  );
-}
-
-/** The printed cover face (the removable shell). */
-function CoverArtFace({ cover }: { cover?: CatalogProduct }) {
-  const [failed, setFailed] = useState(false);
-  const src = cover ? resolveProductImage(cover.imageUrl, failed) : null;
-  return (
-    <div className="relative h-full w-full overflow-hidden rounded-[1.9rem] shadow-depth-lg">
-      {src ? (
-        <Image src={src} alt={cover?.title ?? "Cover"} fill sizes="230px" className="object-cover" onError={() => setFailed(true)} />
-      ) : (
-        <div className="h-full w-full bg-gradient-to-br from-accent-500 via-accent-700 to-ink-900" />
-      )}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/12 to-transparent" />
-      {/* camera cutout aligned over the body's module */}
-      <div className="absolute left-4 top-4 h-[4.25rem] w-[4.25rem] rounded-2xl border border-white/25 bg-black/20 backdrop-blur-[1px]" />
-      <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">CoverCraft</span>
-      <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[1.9rem] ring-1 ring-inset ring-white/15" />
-    </div>
-  );
-}
 
 /** One cross-fading narrative panel, positioned absolutely over its siblings. */
 function StoryPanel({

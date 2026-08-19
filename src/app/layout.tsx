@@ -48,8 +48,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             Skip to content
           </a>
-          <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/95 px-4 py-3 text-white shadow-lg backdrop-blur sm:px-6">
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4"><Link href="/" className="flex items-center gap-2 font-black tracking-tight text-lg sm:text-xl"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-600 text-sm">C</span>CoverCraft</Link>
+          <header className="sticky top-0 z-40 border-b border-white/10 bg-ink-950/80 px-4 py-3 text-white shadow-lg backdrop-blur-xl sm:px-6">
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4"><Link href="/" className="flex items-center gap-2 font-black tracking-tight text-lg sm:text-xl"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm text-white shadow-glow-sm">C</span>CoverCraft</Link>
             <SiteNav /></div>
           </header>
           <main id="main-content" tabIndex={-1} className="focus:outline-none">{children}</main>

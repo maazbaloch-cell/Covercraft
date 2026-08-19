@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { EASE_CINEMATIC, EASE_SOFT_INOUT, DUR, cinematicReveal, lineStagger, lineChild, viewportOnce } from "@/lib/motion";
 import { armSportsDive } from "@/lib/transition";
+import Phone3D from "./Phone3D";
 
 /**
  * CoverWorlds — the three cover worlds (Phase 5).
@@ -50,9 +51,9 @@ const WORLDS: readonly World[] = [
     chips: ["Marble & stone", "Painterly gradients", "Floral bloom", "Gold leaf"],
     cta: "Explore Art",
     href: "/shop",
-    accentText: "text-fuchsia-300",
-    chipRing: "border-fuchsia-300/30",
-    glow: "rgba(217,70,239,0.30)",
+    accentText: "text-amber-300",
+    chipRing: "border-amber-300/30",
+    glow: "rgba(245,158,11,0.26)",
   },
   {
     index: "02",
@@ -181,8 +182,11 @@ function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta
       <motion.div style={{ y: backdropY }} aria-hidden className="pointer-events-none absolute inset-0 -z-10 scale-110">
         <WorldBackdrop world={world} reduce={!!reduce} />
       </motion.div>
-      {/* Legibility scrims top & bottom so copy always reads */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-ink-950/70 via-transparent to-ink-950/80" />
+      {/* Legibility scrim: darkest in the MIDDLE (behind the centered copy),
+          fading to fully transparent at top & bottom. Because adjacent scenes
+          meet at transparent edges, two scrims never stack into a dark seam
+          line — the worlds blend into the one shared canvas behind them. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-ink-950/40 to-transparent" />
 
       <div className="mx-auto grid w-full max-w-[var(--cinema-max)] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-8">
         {/* Copy */}
@@ -243,152 +247,54 @@ function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta
 }
 
 /* ------------------------------------------------------------------ *
- * A phone frame whose cover face is procedural, themed per world.
+ * A realistic WebGL phone wearing this world's themed case (shared Phone3D),
+ * with a gentle idle float. The scene's scroll-parallax wrapper still moves the
+ * whole canvas, so the existing motion is preserved.
  * ------------------------------------------------------------------ */
 function WorldPhone({ world }: { world: World }) {
   return (
-    <div className="relative h-[440px] w-[220px] rounded-[2.5rem] border border-white/15 bg-gradient-to-b from-white/10 to-white/[0.02] p-2.5 shadow-depth-lg sm:h-[500px] sm:w-[250px]">
-      <div className="relative h-full w-full overflow-hidden rounded-[2rem]">
-        <WorldCoverFace world={world} />
-        {/* Sheen */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent" />
-        {/* Camera module */}
-        <div className="absolute left-4 top-4 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-2xl border border-white/15 bg-black/40 backdrop-blur-sm">
-          <div className="grid grid-cols-2 gap-1.5">
-            <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-5 w-5 rounded-full bg-ink-950 ring-2 ring-white/10" />
-            <span className="h-5 w-5 rounded-full bg-white/20 ring-2 ring-white/10" />
-          </div>
-        </div>
-        <span className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-black uppercase tracking-[0.3em] text-white/60">
-          CoverCraft
-        </span>
-      </div>
-    </div>
+    <Phone3D
+      skin={world.key}
+      idle
+      className="h-[440px] w-[214px] sm:h-[500px] sm:w-[242px]"
+    />
   );
 }
 
 /* ------------------------------------------------------------------ *
- * Procedural cover faces — the design language of each world (CSS only).
+ * Full-scene backdrop art. TRANSPARENT base — every world layers its tint
+ * ON TOP of the page's shared fixed canvas, and each tint is vertically
+ * masked to fade to nothing at the scene's top & bottom edges, so worlds
+ * dissolve into one another with no boxes and no horizontal seams.
  * ------------------------------------------------------------------ */
-function WorldCoverFace({ world }: { world: World }) {
-  if (world.key === "art") {
-    return (
-      <div className="absolute inset-0">
-        {/* Marble base: warm ivory with veining */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "conic-gradient(from 210deg at 30% 25%, #fdf4ff, #f5d0fe 20%, #e9d5ff 42%, #fbcfe8 63%, #fde68a 82%, #fdf4ff)",
-          }}
-        />
-        {/* Gold veins */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-70 mix-blend-overlay"
-          style={{
-            background:
-              "radial-gradient(60% 40% at 70% 20%, rgba(202,138,4,0.55), transparent 60%), radial-gradient(50% 45% at 20% 80%, rgba(217,70,239,0.4), transparent 60%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-60"
-          style={{
-            background:
-              "repeating-linear-gradient(115deg, transparent 0 22px, rgba(180,120,20,0.18) 22px 23px, transparent 23px 40px)",
-          }}
-        />
-      </div>
-    );
-  }
 
-  if (world.key === "gaming") {
-    return (
-      <div className="absolute inset-0 bg-[#05070f]">
-        {/* Neon perspective grid floor */}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 top-1/3 origin-bottom opacity-80"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(34,211,238,0.55) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.55) 1px, transparent 1px)",
-            backgroundSize: "26px 26px",
-            transform: "perspective(340px) rotateX(62deg)",
-            maskImage: "linear-gradient(to bottom, transparent, #000 55%)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 55%)",
-          }}
-        />
-        {/* Neon horizon glow */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(70% 40% at 50% 42%, rgba(34,211,238,0.35), transparent 60%), radial-gradient(50% 30% at 75% 22%, rgba(232,121,249,0.35), transparent 60%)",
-          }}
-        />
-        {/* Scanlines */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-30"
-          style={{ background: "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 4px)" }}
-        />
-      </div>
-    );
-  }
+// Fade every world's art to transparent at the top & bottom of its scene so it
+// melts into the continuous canvas above and below it.
+const EDGE_FADE = {
+  maskImage: "linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent)",
+  WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent)",
+} as const;
 
-  // sports
-  return (
-    <div className="absolute inset-0 bg-[#04120c]">
-      {/* Energy field */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 30% 20%, rgba(16,185,129,0.45), transparent 60%), radial-gradient(55% 45% at 80% 80%, rgba(163,230,53,0.4), transparent 60%)",
-        }}
-      />
-      {/* Diagonal speed streaks */}
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-70"
-        style={{
-          background:
-            "repeating-linear-gradient(58deg, transparent 0 16px, rgba(255,255,255,0.10) 16px 18px, transparent 18px 30px)",
-        }}
-      />
-      {/* Bold numeral */}
-      <span className="absolute inset-0 flex items-center justify-center font-display text-[9rem] font-bold leading-none text-white/15">
-        09
-      </span>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Full-scene backdrop art (behind the whole world section).
- * ------------------------------------------------------------------ */
 function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
   if (world.key === "art") {
     return (
-      <div className="absolute inset-0 bg-ink-950">
+      <div className="absolute inset-0" style={EDGE_FADE}>
+        {/* Gallery light: warm gold + brand blue washes (no purple). */}
         <div
           className={`absolute inset-0 ${reduce ? "" : "animate-aurora-drift"}`}
           style={{
             background:
-              "radial-gradient(40% 40% at 20% 30%, rgba(217,70,239,0.22), transparent 60%), radial-gradient(45% 45% at 80% 70%, rgba(168,85,247,0.20), transparent 60%), radial-gradient(35% 35% at 60% 15%, rgba(251,191,36,0.14), transparent 60%)",
+              "radial-gradient(40% 40% at 20% 30%, rgba(37,99,235,0.20), transparent 60%), radial-gradient(45% 45% at 80% 70%, rgba(96,165,250,0.16), transparent 60%), radial-gradient(35% 35% at 60% 15%, rgba(245,158,11,0.16), transparent 60%)",
           }}
         />
+        {/* faint gold leaf streaks */}
+        <div aria-hidden className="absolute inset-0 opacity-50" style={{ background: "repeating-linear-gradient(115deg, transparent 0 34px, rgba(245,158,11,0.10) 34px 35px, transparent 35px 60px)" }} />
       </div>
     );
   }
   if (world.key === "gaming") {
     return (
-      <div className="absolute inset-0 bg-[#03040a]">
+      <div className="absolute inset-0" style={EDGE_FADE}>
         {/* Wide perspective grid */}
         <div
           aria-hidden
@@ -405,13 +311,13 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
         <div
           aria-hidden
           className="absolute inset-0"
-          style={{ background: "radial-gradient(50% 40% at 50% 30%, rgba(34,211,238,0.18), transparent 60%), radial-gradient(40% 30% at 78% 60%, rgba(232,121,249,0.16), transparent 60%)" }}
+          style={{ background: "radial-gradient(50% 40% at 50% 30%, rgba(34,211,238,0.18), transparent 60%), radial-gradient(40% 30% at 78% 60%, rgba(37,99,235,0.20), transparent 60%)" }}
         />
       </div>
     );
   }
   return (
-    <div className="absolute inset-0 bg-[#03100a]">
+    <div className="absolute inset-0" style={EDGE_FADE}>
       <div
         aria-hidden
         className="absolute inset-0 opacity-50"

@@ -86,44 +86,47 @@ export default function AdminNav() {
               role="dialog"
               aria-modal="true"
               aria-label="Admin login"
-              className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl"
+              className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-ink-900/90 p-6 text-white shadow-depth backdrop-blur-xl"
               initial={{ opacity: 0, scale: 0.94, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 12 }}
               transition={{ duration: DUR.base, ease: EASE_OUT_EXPO }}
             >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Admin Login</h2>
-                <button type="button" onClick={() => setShowLogin(false)} className="text-gray-500 transition-colors hover:text-gray-800 active:scale-90">
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <p className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-accent-400">CoverCraft · Admin</p>
+                  <h2 className="text-lg font-semibold text-white">Admin Login</h2>
+                </div>
+                <button type="button" onClick={() => setShowLogin(false)} className="text-white/50 transition-colors hover:text-white active:scale-90">
                   ×
                 </button>
               </div>
               <form onSubmit={login} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <label className="block text-sm font-medium text-white/70">Email</label>
                   <input
                     autoComplete="email"
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/40 outline-none transition focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Password</label>
+                  <label className="block text-sm font-medium text-white/70">Password</label>
                   <input
                     autoComplete="current-password"
                     type="password"
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-white/40 outline-none transition focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
                 <AnimatePresence initial={false}>
-                  {error && <motion.p key="err" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="overflow-hidden text-sm text-red-500">{error}</motion.p>}
+                  {error && <motion.p key="err" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="overflow-hidden text-sm text-red-400">{error}</motion.p>}
                 </AnimatePresence>
-                <motion.button whileTap={{ scale: 0.98 }} type="submit" disabled={submitting} className="relative w-full rounded bg-brand px-4 py-2 text-white transition-colors hover:bg-brand-accent disabled:opacity-70">
+                <motion.button whileTap={{ scale: 0.98 }} type="submit" disabled={submitting} className="relative w-full rounded-lg bg-accent-600 px-4 py-2 font-semibold text-white shadow-glow transition-colors hover:bg-accent-500 disabled:opacity-70">
                   <span className={submitting ? "opacity-0" : ""}>Continue to Dashboard</span>
                   {submitting && <span className="absolute inset-0 flex items-center justify-center"><Spinner /></span>}
                 </motion.button>

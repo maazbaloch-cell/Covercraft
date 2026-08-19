@@ -203,7 +203,7 @@ export default function CustomCoverDesigner() {
     router.push("/cart");
   };
 
-  return <div className="design-studio max-w-6xl mx-auto px-4 py-10 sm:px-6">
+  return <div className="util-dark design-studio max-w-6xl mx-auto px-4 py-10 sm:px-6">
     <div className="mb-8"><p className="text-sm text-brand-accent font-semibold uppercase tracking-wide">Create your own</p><h1 className="text-3xl font-bold">Custom Mobile Cover Designer</h1><p className="text-gray-600 mt-2">Upload images, add text and make a cover that is uniquely yours.</p></div>
     <div className="grid lg:grid-cols-[1fr_380px] gap-8 items-start">
       <section className="bg-white border rounded-xl p-3 shadow-sm sm:p-5"><div className="flex justify-center overflow-x-auto bg-gray-50 rounded-xl py-6"><canvas ref={htmlCanvasRef} aria-label="Custom cover design canvas" /></div><p className="text-center text-xs text-gray-500 mt-3">Select an item to move, resize, rotate, or change its layer.</p></section>

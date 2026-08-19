@@ -101,7 +101,7 @@ export default function SiteNav() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.24, ease: EASE_OUT_EXPO }}
-            className="absolute -right-2.5 -top-2.5 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-black leading-none text-white"
+            className="absolute -right-2.5 -top-2.5 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-black leading-none text-white"
           >
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span key={count} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}>{count}</motion.span>

@@ -14,7 +14,7 @@ export default function NewsletterForm({
   className = "",
   inputClassName = "min-w-0 flex-1 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none",
   buttonClassName = "shrink-0 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-60",
-  messageClassName = "text-violet-50",
+  messageClassName = "text-blue-50",
 }: {
   className?: string;
   inputClassName?: string;

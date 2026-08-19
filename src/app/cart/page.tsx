@@ -99,7 +99,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-3xl px-6 py-20">
+      <div className="util-dark mx-auto max-w-3xl px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,7 +109,7 @@ export default function CartPage() {
           <motion.span
             animate={{ y: [0, -9, 0] }}
             transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-            className="flex h-20 w-20 items-center justify-center rounded-2xl bg-violet-100 text-violet-700"
+            className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-100 text-accent-700"
             aria-hidden
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></svg>
@@ -117,7 +117,7 @@ export default function CartPage() {
           <h1 className="mt-6 text-2xl font-black tracking-tight text-slate-950">Your cart is empty</h1>
           <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">Looks like you haven&apos;t added anything yet. Explore the collection and find a cover worth showing off.</p>
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="mt-7">
-            <Link href="/shop" className="group inline-flex items-center rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-violet-700">
+            <Link href="/shop" className="group inline-flex items-center rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-accent-700">
               Browse covers<span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
             </Link>
           </motion.div>
@@ -130,7 +130,7 @@ export default function CartPage() {
   const detailsLocked = step === "otp";
 
   return (
-    <div className="premium-cart max-w-3xl mx-auto px-6 py-10">
+    <div className="util-dark premium-cart max-w-3xl mx-auto px-6 py-10">
       <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
 
       <div className="mb-8">
@@ -162,7 +162,7 @@ export default function CartPage() {
                       aria-label="Decrease quantity"
                       onClick={() => updateQuantity(i.productId, Math.max(1, i.quantity - 1))}
                       disabled={i.quantity <= 1}
-                      className="px-2.5 py-1 text-lg font-bold text-slate-600 transition-colors hover:text-violet-700 active:scale-90 disabled:opacity-40"
+                      className="px-2.5 py-1 text-lg font-bold text-slate-600 transition-colors hover:text-accent-700 active:scale-90 disabled:opacity-40"
                     >−</button>
                     <span className="inline-flex h-6 w-8 items-center justify-center overflow-hidden text-sm font-bold">
                       <AnimatePresence mode="popLayout" initial={false}>
@@ -173,7 +173,7 @@ export default function CartPage() {
                       type="button"
                       aria-label="Increase quantity"
                       onClick={() => updateQuantity(i.productId, i.quantity + 1)}
-                      className="px-2.5 py-1 text-lg font-bold text-slate-600 transition-colors hover:text-violet-700 active:scale-90"
+                      className="px-2.5 py-1 text-lg font-bold text-slate-600 transition-colors hover:text-accent-700 active:scale-90"
                     >+</button>
                   </div>
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => removeItem(i.productId)} className="text-sm text-red-500 transition-colors hover:text-red-600">

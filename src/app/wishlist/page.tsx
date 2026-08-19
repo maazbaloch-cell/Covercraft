@@ -53,13 +53,13 @@ export default function WishlistPage() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
+    <main className="util-dark mx-auto max-w-6xl px-6 py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-violet-700">Your CoverCraft account</p>
+          <p className="text-xs font-bold uppercase tracking-[.2em] text-accent-700">Your CoverCraft account</p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Saved covers</h1>
         </div>
-        <Link href="/account/dashboard" className="text-sm font-bold text-violet-700">← Back to account</Link>
+        <Link href="/account/dashboard" className="text-sm font-bold text-accent-700">← Back to account</Link>
       </div>
 
       <AnimatePresence initial={false}>
@@ -78,7 +78,7 @@ export default function WishlistPage() {
           <span className="text-5xl">♡</span>
           <h2 className="mt-4 text-xl font-black text-slate-950">No saved covers yet</h2>
           <p className="mt-2 max-w-sm text-sm text-slate-500">Tap the heart on any cover to save it here for later.</p>
-          <Link href="/shop" className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-violet-700">Browse the collection</Link>
+          <Link href="/shop" className="mt-5 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-accent-700">Browse the collection</Link>
         </motion.div>
       )}
 
@@ -102,12 +102,12 @@ export default function WishlistPage() {
                   <Image src={resolveProductImage(entry.product.imageUrl)} alt={entry.product.title} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
                 </Link>
                 <div className="flex flex-1 flex-col gap-1.5 p-4">
-                  {entry.product.category && <span className="text-xs uppercase tracking-wide text-violet-700">{entry.product.category}</span>}
-                  <Link href={`/products/${entry.product.id}`} className="line-clamp-1 text-sm font-bold text-slate-900 transition hover:text-violet-700">{entry.product.title}</Link>
+                  {entry.product.category && <span className="text-xs uppercase tracking-wide text-accent-700">{entry.product.category}</span>}
+                  <Link href={`/products/${entry.product.id}`} className="line-clamp-1 text-sm font-bold text-slate-900 transition hover:text-accent-700">{entry.product.title}</Link>
                   <p className="font-black text-slate-900">Rs. {(entry.product.price / 100).toLocaleString()}</p>
                   <p className={`text-xs font-semibold ${isOut ? "text-rose-600" : "text-emerald-600"}`}>{isOut ? "Out of stock" : "In stock"}</p>
                   <div className="mt-3 flex gap-2">
-                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => addToCart(entry)} disabled={isOut} className="flex-1 rounded-lg bg-slate-950 py-2 text-xs font-bold text-white transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    <motion.button whileTap={{ scale: 0.96 }} onClick={() => addToCart(entry)} disabled={isOut} className="flex-1 rounded-lg bg-slate-950 py-2 text-xs font-bold text-white transition-colors hover:bg-accent-700 disabled:cursor-not-allowed disabled:opacity-50">
                       {isOut ? "Unavailable" : "Add to cart"}
                     </motion.button>
                     <motion.button whileTap={{ scale: 0.94 }} onClick={() => remove(entry.productId)} aria-label={`Remove ${entry.product.title} from wishlist`} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 transition-colors hover:border-rose-300 hover:text-rose-600">

@@ -26,8 +26,8 @@ function AnimatedNumber({ value, prefix = "", format = (n: number) => Math.round
 const STATUS_BADGE: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
   CONFIRMED: "bg-sky-100 text-sky-700",
-  PROCESSING: "bg-indigo-100 text-indigo-700",
-  SHIPPED: "bg-violet-100 text-violet-700",
+  PROCESSING: "bg-cyan-100 text-cyan-700",
+  SHIPPED: "bg-teal-100 text-teal-700",
   OUT_FOR_DELIVERY: "bg-blue-100 text-blue-700",
   DELIVERED: "bg-emerald-100 text-emerald-700",
   CANCELLED: "bg-rose-100 text-rose-700",
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
       <h2 className="font-semibold mb-3">Orders</h2>
       <motion.div variants={staggerGrid} initial="hidden" animate="show" className="space-y-3">
         {data.orders.map((o: any) => (
-          <motion.div key={o.id} variants={fadeInUp} whileHover={{ y: -2 }} className="bg-white border rounded-xl p-4 transition-shadow duration-300 hover:border-violet-200 hover:shadow-md">
+          <motion.div key={o.id} variants={fadeInUp} whileHover={{ y: -2 }} className="bg-white border rounded-xl p-4 transition-shadow duration-300 hover:border-brand/40 hover:shadow-md">
             <div className="flex flex-col md:flex-row justify-between gap-3 mb-3">
               <div>
                 <p className="font-semibold">{o.orderNumber} — {o.customerName}</p>

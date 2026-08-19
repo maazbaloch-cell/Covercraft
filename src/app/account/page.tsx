@@ -165,7 +165,7 @@ export default function AccountPage() {
       {success && (
         <motion.div key="auth-success" aria-hidden className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: DUR.base, ease: EASE_OUT_EXPO }}>
           <div className="absolute inset-0 bg-ink-950/50" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.35),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.35),transparent_60%)]" />
           <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: DUR.slow, ease: EASE_CINEMATIC }} className="relative flex h-20 w-20 items-center justify-center rounded-full bg-accent-600 shadow-glow">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5l5 5L20 6.5" /></svg>
           </motion.div>
