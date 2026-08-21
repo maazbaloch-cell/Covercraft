@@ -41,6 +41,7 @@ export type Phone3DProps = {
 // pull in the 3D chunk just to look up a colour).
 const GLOW: Record<PhoneSkin, string> = {
   cover: "#f97316",
+  navy: "#3b82f6",
   art: "#60a5fa",
   gaming: "#38bdf8",
   sports: "#10b981",
@@ -91,9 +92,15 @@ export default function Phone3D({ skin = "cover", className = "", glow = false, 
 
   if (!enabled) {
     // SSR / reduced-motion / no-WebGL: the composable CSS device (static, safe).
+    // Use the SAME skin-aware glow as the WebGL path (blue for navy, orange for the
+    // cover skin) rather than IphoneFrame's built-in orange halo, so the neutral
+    // navy product never flashes an orange glow on first paint or for these users.
     return (
-      <div className={className}>
-        <IphoneFrame glow={glow} className="h-full w-full">
+      <div className={`relative ${className}`}>
+        {glow && (
+          <div aria-hidden className="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem] blur-3xl" style={{ background: `${GLOW[skin]}30` }} />
+        )}
+        <IphoneFrame className="h-full w-full">
           <PhoneBackSurface />
           <CoverSkin variant={skin} />
         </IphoneFrame>

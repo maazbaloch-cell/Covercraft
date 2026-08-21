@@ -45,10 +45,12 @@ export default function HomeExperience({ featured }: { featured: CatalogProduct[
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-ink-950" />
         <div className="absolute inset-0 bg-aurora animate-aurora-drift" />
-        {/* large, soft, blurred light sources — depth + gentle colour drift */}
+        {/* large, soft, blurred light sources — depth + gentle colour drift.
+            Navy/blue only: the environment stays on-brand and orange is reserved
+            for the product/case, so no section reads as a different colour. */}
         <div className="absolute -left-[15%] top-[-10%] h-[75vmax] w-[75vmax] rounded-full bg-accent-700/20 blur-[150px]" />
         <div className="absolute right-[-10%] top-[25%] h-[60vmax] w-[60vmax] rounded-full bg-accent-500/12 blur-[160px]" />
-        <div className="absolute bottom-[-15%] left-[20%] h-[65vmax] w-[65vmax] rounded-full bg-cover-600/10 blur-[170px]" />
+        <div className="absolute bottom-[-15%] left-[20%] h-[65vmax] w-[65vmax] rounded-full bg-accent-800/12 blur-[170px]" />
         {/* faint top-of-frame brand light + edge vignette so the frame focuses inward */}
         <div className="absolute inset-0" style={{ background: "radial-gradient(120% 70% at 50% -10%, rgba(37,99,235,0.16), transparent 55%)" }} />
         <div className="vignette absolute inset-0" />
@@ -73,11 +75,14 @@ function Hero({ cover }: { cover?: CatalogProduct }) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   // Scroll-as-camera (gated for reduced motion): copy drifts up + fades, phone
-  // sinks and rotates a touch as the hero scrolls away.
+  // sinks as the hero scrolls away. NOTE: no CSS `rotate` on the phone — the
+  // device is a real WebGL <canvas>, and rotating a canvas by a non-orthogonal
+  // angle resamples its bitmap every frame, which shows as shimmering / jagged
+  // ("scratched", distorted) edges while scrolling. A pure translate (transform,
+  // GPU-composited) moves it cleanly with no resampling.
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -70]);
   const copyOpacity = useTransform(scrollYProgress, [0, 0.7], [1, reduce ? 1 : 0]);
   const phoneY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 90]);
-  const phoneRotate = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 8]);
 
   return (
     <section
@@ -166,7 +171,7 @@ function Hero({ cover }: { cover?: CatalogProduct }) {
 
       {/* Floating cover / phone */}
       <motion.div
-        style={{ y: phoneY, rotate: phoneRotate }}
+        style={{ y: phoneY }}
         className="relative z-10 flex flex-1 items-center justify-center"
       >
         <motion.div

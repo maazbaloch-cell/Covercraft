@@ -28,6 +28,7 @@ type SkinDef = {
 };
 const SKINS: Record<PhoneSkin, SkinDef> = {
   cover: { case: { color: "#f4691b", roughness: 0.52, clearcoat: 0.45, sheen: 1, sheenColor: "#ffb877" }, glowColor: "#f97316" },
+  navy: { case: { color: "#12213b", roughness: 0.36, clearcoat: 0.85, sheen: 0.55, sheenColor: "#dbe7ff" }, glowColor: "#3b82f6" },
   art: { case: { color: "#8ea2d8", roughness: 0.35, clearcoat: 0.8, sheen: 0.6, sheenColor: "#e7ecff" }, glowColor: "#60a5fa" },
   gaming: { case: { color: "#12305a", roughness: 0.3, clearcoat: 0.9, sheen: 0.4, sheenColor: "#38bdf8" }, glowColor: "#38bdf8" },
   sports: { case: { color: "#0f5138", roughness: 0.44, clearcoat: 0.5, sheen: 0.5, sheenColor: "#a3e635" }, glowColor: "#10b981" },

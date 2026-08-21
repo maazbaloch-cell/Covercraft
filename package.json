@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "seed:phones": "ts-node --project prisma/tsconfig.seed.json prisma/seedPhones.ts"
+    "seed:phones": "ts-node --project prisma/tsconfig.seed.json prisma/seedPhones.ts",
+    "seed:faqs": "ts-node --project prisma/tsconfig.seed.json prisma/seedFaqs.ts"
   },
   "prisma": {
     "seed": "ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"

@@ -20,8 +20,10 @@ function sweep(now: number) {
 
 /** A lightweight in-memory guard. Synchronous by design so callers can gate without awaiting. */
 export function isRateLimited(req: NextRequest, scope: string, limit = 10, windowMs = 60_000) {
-  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const key = `${scope}:${forwarded || "unknown"}`;
+  // Prefer the platform-derived client IP (Vercel sets req.ip / x-real-ip at the edge, which a
+  // client cannot forge); fall back to the left-most x-forwarded-for only when neither is set.
+  const ip = req.ip || req.headers.get("x-real-ip")?.trim() || req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const key = `${scope}:${ip || "unknown"}`;
   const now = Date.now();
   sweep(now);
   const entry = buckets.get(key);

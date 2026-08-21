@@ -13,7 +13,7 @@ const LINKS = [
   { href: "/customize-cover", label: "Customize" },
   { href: "/track", label: "Track Order" },
   { href: "/account", label: "Account" },
-  { href: "/complaint", label: "Support" },
+  { href: "/support", label: "Support" },
 ];
 
 /**

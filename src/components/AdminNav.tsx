@@ -13,20 +13,6 @@ export default function AdminNav() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/admin/orders", { credentials: "include" });
-        setIsAuthenticated(res.ok);
-      } catch {
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
 
   // Close the login modal on Escape while it's open.
   useEffect(() => {
@@ -51,7 +37,6 @@ export default function AdminNav() {
       });
 
       if (res.ok) {
-        setIsAuthenticated(true);
         setShowLogin(false);
         router.push("/admin/dashboard");
       } else {

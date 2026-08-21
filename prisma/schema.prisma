@@ -28,6 +28,7 @@ model Customer {
   orders    Order[]
   wishlist  WishlistItem[]
   settings  CustomerSetting?
+  supportTickets SupportTicket[]
 }
 
 model Address {
@@ -214,6 +215,46 @@ model Complaint {
   createdAt   DateTime @default(now())
 }
 
+// Support Center — knowledge-base articles shown in the FAQ accordion.
+// Customers read only isPublished rows; admins manage all of them.
+model FaqItem {
+  id          String          @id @default(cuid())
+  question    String
+  answer      String
+  category    SupportCategory @default(OTHER)
+  slug        String          @unique
+  sortOrder   Int             @default(0)
+  isPublished Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([isPublished, category, sortOrder])
+}
+
+// Support Center — a customer help request. Associated with a Customer when the
+// requester is authenticated (customerId is set server-side from the session,
+// NEVER trusted from the client). adminNotes is internal-only and is never
+// returned by any customer-facing endpoint.
+model SupportTicket {
+  id           String          @id @default(cuid())
+  ticketNumber String          @unique
+  name         String
+  email        String
+  orderNumber  String?
+  category     SupportCategory @default(OTHER)
+  subject      String
+  message      String
+  status       SupportStatus   @default(OPEN)
+  adminNotes   String?
+  customerId   String?
+  customer     Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([status, createdAt])
+  @@index([customerId, createdAt])
+}
+
 model VerificationCode {
   id         String    @id @default(cuid())
   email      String
@@ -247,4 +288,21 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SupportCategory {
+  ORDERING
+  SHIPPING
+  TRACKING
+  CUSTOMIZATION
+  PAYMENTS
+  RETURNS
+  OTHER
 }

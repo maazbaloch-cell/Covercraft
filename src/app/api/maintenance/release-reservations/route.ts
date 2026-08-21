@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { failOrderAndRestoreStock } from "@/lib/orderConfirmation";
 
@@ -11,8 +12,12 @@ const RESERVATION_TTL_MS = 30 * 60_000;
 function authorized(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
-  const header = req.headers.get("authorization");
-  return header === `Bearer ${secret}`;
+  const header = req.headers.get("authorization") || "";
+  const expected = `Bearer ${secret}`;
+  const a = Buffer.from(header);
+  const b = Buffer.from(expected);
+  // Constant-time compare so the secret can't be recovered by timing the response.
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 async function releaseExpiredReservations() {

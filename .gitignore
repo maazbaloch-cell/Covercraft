@@ -12,3 +12,6 @@ node_modules
 # Never commit session credentials or secrets
 cookies.txt
 *.pem
+
+# Temp video sources for the /track cinematic (public/track holds the shippable output)
+.mediasrc/

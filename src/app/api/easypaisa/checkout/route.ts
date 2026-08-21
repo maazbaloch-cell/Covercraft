@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     address: formData.get("address"), city: formData.get("city"),
   });
   const cartJson = formData.get("cart") as string;
-  if (!customer.success || !cartJson || cartJson.length > 250_000) {
+  if (!customer.success || !cartJson || cartJson.length > 5_000_000) {
     return new NextResponse("Missing required fields", { status: 400 });
   }
   const { name, email, phone, address, city } = customer.data;
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
     for (const item of cart.filter((item) => item.productType === "customized_cover")) {
       const design = item.customDesign;
-      if (!design?.mobileModel || !design.templateName || !design.canvasJson || !design.previewImage || design.canvasJson.length > 150_000 || design.previewImage.length > 2_000_000) return new NextResponse("Invalid custom design", { status: 400 });
+      if (!design?.mobileModel || !design.templateName || !design.canvasJson || !design.previewImage || design.canvasJson.length > 2_500_000 || design.previewImage.length > 1_500_000) return new NextResponse("Invalid custom design", { status: 400 });
       const template = design.templateId ? await prisma.coverTemplate.findFirst({ where: { id: design.templateId, isActive: true } }) : null;
       if (!template) return new NextResponse("Selected custom-cover template is unavailable.", { status: 409 });
       totalAmount += template.price * item.quantity;
@@ -69,8 +69,21 @@ export async function POST(req: NextRequest) {
     if (!Number.isSafeInteger(totalAmount) || totalAmount <= 0) return new NextResponse("Invalid order amount", { status: 400 });
   } catch { return new NextResponse("Invalid cart data", { status: 400 }); }
 
+  // Build and validate the EasyPaisa handoff BEFORE writing anything to the database.
+  // paymentService.initiate is pure (it only builds + encrypts the request fields) and
+  // throws on a misconfigured gateway or a non-HTTPS base URL. Doing it first means a
+  // misconfiguration fails fast with a 503 instead of orphaning an UNPAID order and
+  // holding its reserved stock until the release cron runs.
+  const orderNumber = generateOrderNumber();
+  let checkout: ReturnType<typeof paymentService.initiate>;
+  try {
+    checkout = paymentService.initiate({ orderNumber, amountInPaisas: totalAmount, callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/easypaisa/callback`, email, phone });
+  } catch (error) {
+    console.error("[payment:easypaisa] initiation failed", { orderNumber, error: error instanceof Error ? error.message : "Unknown error" });
+    return new NextResponse("Payment service is temporarily unavailable. Please try again later.", { status: 503 });
+  }
+
   const order = await prisma.$transaction(async (tx) => {
-    const orderNumber = generateOrderNumber();
     const items = [] as Prisma.OrderItemCreateWithoutOrderInput[];
     for (const item of cart) {
       if (item.productType === "customized_cover") {
@@ -92,13 +105,6 @@ export async function POST(req: NextRequest) {
   });
   if (!order) return new NextResponse("One or more items just sold out. Please refresh your cart.", { status: 409 });
 
-  let checkout: ReturnType<typeof paymentService.initiate>;
-  try {
-    checkout = paymentService.initiate({ orderNumber: order.orderNumber, amountInPaisas: totalAmount, callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/easypaisa/callback`, email, phone });
-  } catch (error) {
-    console.error("[payment:easypaisa] initiation failed", { orderNumber: order.orderNumber, error: error instanceof Error ? error.message : "Unknown error" });
-    return new NextResponse("Payment service is temporarily unavailable. Please try again later.", { status: 503 });
-  }
   logPaymentEvent("checkout initiated", checkout.fields);
 
   const inputsHtml = Object.entries(checkout.fields)

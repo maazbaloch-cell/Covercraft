@@ -65,10 +65,13 @@ export default function ScrollStory() {
   // feel silky, not so much that the device visibly lags behind the scrollbar.
   const progress = useSpring(scrollYProgress, { stiffness: 130, damping: 30, mass: 0.35 });
 
-  // Camera push — a CSS "dolly" that scales the 3D phone's container so the
-  // camera appears to move toward the product, then settles. The phone's own
-  // yaw and the case peel are driven in-scene by the MotionValues below.
-  const deviceScale = useTransform(progress, [0, 0.35, 1], [0.82, 1.06, 1.0]);
+  // Camera push is driven ENTIRELY inside the 3D scene: Phone3DCanvas runs a
+  // subtle group dolly-out in useFrame (scale ← 1 - sep*0.1) as the case lifts,
+  // so the composition stays framed. We deliberately do NOT also CSS-scale the
+  // canvas container here — a CSS transform resamples the raster <canvas> every
+  // frame, softening/distorting the phone during scroll, and having two size
+  // controllers (CSS scale + 3D dolly) fight each other. One controller (the 3D
+  // one) keeps the phone crisp and the motion coherent.
 
   // Cover separation (0→1) + a gentle yaw orbit, fed straight into Phone3D. The
   // 3D case is a real extruded shell with a camera cutout, so it lifts off with
@@ -146,9 +149,18 @@ export default function ScrollStory() {
           is the chrome-hidden height, so a `h-screen` pin clips top/bottom while
           the URL bar shows and jumps when it collapses mid-scroll. svh is stable
           and fits the visible area; on desktop svh == vh so nothing changes. */}
-      <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
-        {/* framing */}
-        <div aria-hidden className="vignette pointer-events-none absolute inset-0" />
+      {/* No overflow-hidden here: the pinned scene must let the 3D phone + the
+          peeling case use their full frame as they separate. Clipping was the
+          root cause of the "phone gets cut" report. This scene adds NO background
+          of its own — it sits directly on the page's shared fixed canvas, so it
+          reads as one continuous surface with the hero above and the worlds below. */}
+      <div className="sticky top-0 flex h-[100svh] items-center">
+        {/* framing — NO local vignette here. The page's global fixed background
+            (HomeExperience) already applies ONE vignette across the whole
+            viewport; adding a second inset shadow only in this pinned scene made
+            banner 2's edges visibly darker than the hero and the lower worlds,
+            reading as a boxed section / horizontal boundary. Dropping it makes
+            the upper banners share the exact same continuous background. */}
         <p className="absolute left-1/2 top-20 -translate-x-1/2 text-[11px] font-bold uppercase tracking-[0.32em] text-accent-400/90">
           Enter the product
         </p>
@@ -181,7 +193,18 @@ export default function ScrollStory() {
               Scroll to open
             </motion.span>
 
-            <motion.div style={{ scale: deviceScale }} className="will-cinema relative h-[360px] w-[200px] sm:h-[520px] sm:w-[300px]">
+            {/* HEIGHT-LOCKED, WIDTH FILLS THE COLUMN. The phone's on-screen size
+                is set by the fixed height + the camera's VERTICAL fov, so it is
+                unchanged — but the box now spans the full column width (w-full,
+                capped) instead of a narrow fixed 332px. R3F derives the camera's
+                HORIZONTAL field from the canvas aspect ratio, so a wider box shows
+                more world left/right, giving the separating + rotating orange case
+                room to travel right and stay FULLY rendered. (The old narrow box
+                was the hard vertical cut: the case projected past the canvas's own
+                right edge, which a <canvas> never draws beyond.) w-full is bounded
+                by the column → no horizontal overflow / no scrollbar; the canvas is
+                never CSS-scaled → the phone stays crisp; R3F auto-resizes. */}
+            <div className="relative h-[420px] w-full max-w-[360px] sm:h-[560px] sm:max-w-[560px]">
               {/* growing ambient light behind the revealed body */}
               <motion.div style={{ opacity: bodyGlow }} aria-hidden className="pointer-events-none absolute -inset-10 -z-10 rounded-full bg-cover-500/30 blur-3xl" />
 
@@ -189,7 +212,7 @@ export default function ScrollStory() {
                   while the orange case — a physical shell with a real camera
                   cutout — lifts off, driven by `sep`; `spin` gently orbits it. */}
               <Phone3D skin="cover" separation={sep} spin={spin} className="h-full w-full" />
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

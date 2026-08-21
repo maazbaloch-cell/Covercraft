@@ -176,17 +176,18 @@ function WorldScene({ world, flip, onCta }: { world: World; flip: boolean; onCta
     <div
       ref={ref}
       id={`world-${world.key}`}
-      className="relative flex min-h-[100svh] w-full items-center overflow-hidden py-24"
+      className="relative flex min-h-[100svh] w-full items-center py-24"
     >
       {/* Themed procedural backdrop (parallax) */}
       <motion.div style={{ y: backdropY }} aria-hidden className="pointer-events-none absolute inset-0 -z-10 scale-110">
         <WorldBackdrop world={world} reduce={!!reduce} />
       </motion.div>
-      {/* Legibility scrim: darkest in the MIDDLE (behind the centered copy),
-          fading to fully transparent at top & bottom. Because adjacent scenes
-          meet at transparent edges, two scrims never stack into a dark seam
-          line — the worlds blend into the one shared canvas behind them. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-ink-950/25 to-transparent" />
+      {/* No scrim / no overflow-hidden: a dark scrim per scene stacked into a
+          periodic dark BAND between worlds (the reported "horizontal color
+          line"), and clipping cut the parallax phone. The tints below are soft
+          and edge-faded to transparent, so every world melts into the one
+          shared fixed canvas — no boxes, no seams — while the phone stays free
+          to drift without being cut. Copy stays legible on the dark base. */}
 
       <div className="mx-auto grid w-full max-w-[var(--cinema-max)] items-center gap-10 px-6 lg:grid-cols-2 lg:gap-8">
         {/* Copy */}
@@ -284,11 +285,11 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
           className={`absolute inset-0 ${reduce ? "" : "animate-aurora-drift"}`}
           style={{
             background:
-              "radial-gradient(40% 40% at 20% 30%, rgba(37,99,235,0.20), transparent 60%), radial-gradient(45% 45% at 80% 70%, rgba(96,165,250,0.16), transparent 60%), radial-gradient(35% 35% at 60% 15%, rgba(245,158,11,0.16), transparent 60%)",
+              "radial-gradient(40% 40% at 20% 30%, rgba(37,99,235,0.13), transparent 60%), radial-gradient(45% 45% at 80% 70%, rgba(96,165,250,0.10), transparent 60%), radial-gradient(35% 35% at 60% 15%, rgba(245,158,11,0.10), transparent 60%)",
           }}
         />
         {/* faint gold leaf streaks */}
-        <div aria-hidden className="absolute inset-0 opacity-50" style={{ background: "repeating-linear-gradient(115deg, transparent 0 34px, rgba(245,158,11,0.10) 34px 35px, transparent 35px 60px)" }} />
+        <div aria-hidden className="absolute inset-0 opacity-30" style={{ background: "repeating-linear-gradient(115deg, transparent 0 34px, rgba(245,158,11,0.10) 34px 35px, transparent 35px 60px)" }} />
       </div>
     );
   }
@@ -298,7 +299,7 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
         {/* Wide perspective grid */}
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 top-1/2 origin-bottom opacity-40"
+          className="absolute inset-x-0 bottom-0 top-1/2 origin-bottom opacity-25"
           style={{
             backgroundImage:
               "linear-gradient(rgba(34,211,238,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.5) 1px, transparent 1px)",
@@ -311,7 +312,7 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
         <div
           aria-hidden
           className="absolute inset-0"
-          style={{ background: "radial-gradient(50% 40% at 50% 30%, rgba(34,211,238,0.18), transparent 60%), radial-gradient(40% 30% at 78% 60%, rgba(37,99,235,0.20), transparent 60%)" }}
+          style={{ background: "radial-gradient(50% 40% at 50% 30%, rgba(34,211,238,0.12), transparent 60%), radial-gradient(40% 30% at 78% 60%, rgba(37,99,235,0.13), transparent 60%)" }}
         />
       </div>
     );
@@ -320,13 +321,13 @@ function WorldBackdrop({ world, reduce }: { world: World; reduce: boolean }) {
     <div className="absolute inset-0" style={EDGE_FADE}>
       <div
         aria-hidden
-        className="absolute inset-0 opacity-50"
+        className="absolute inset-0 opacity-30"
         style={{ background: "repeating-linear-gradient(58deg, transparent 0 40px, rgba(16,185,129,0.10) 40px 44px, transparent 44px 90px)" }}
       />
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{ background: "radial-gradient(45% 40% at 25% 25%, rgba(16,185,129,0.20), transparent 60%), radial-gradient(45% 40% at 78% 75%, rgba(163,230,53,0.16), transparent 60%)" }}
+        style={{ background: "radial-gradient(45% 40% at 25% 25%, rgba(16,185,129,0.13), transparent 60%), radial-gradient(45% 40% at 78% 75%, rgba(163,230,53,0.10), transparent 60%)" }}
       />
     </div>
   );

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import NewsletterForm from "@/components/NewsletterForm";
 import Reveal from "@/components/Reveal";
-import { staggerContainer, lineChild, DUR, DUR_CINEMA, EASE_OUT_EXPO, EASE_CINEMATIC } from "@/lib/motion";
+import ShopHero from "@/components/ShopHero";
 
 export type CatalogProduct = { id: string; title: string; description: string | null; imageUrl: string; price: number; category: string | null; brand: string | null; model: string | null; stock: number; isAvailable: boolean; createdAt: Date };
 const CATEGORY_ICONS = ["✦", "◒", "◇", "◌", "⊙", "✺", "♛", "↗"];
@@ -19,15 +18,6 @@ export default function ShopCatalog({ products }: { products: CatalogProduct[] }
   const priceMax = useMemo(() => { const top = products.reduce((m, p) => Math.max(m, p.price), 0); return top > 0 ? Math.ceil(top / 10000) * 10000 : 250000; }, [products]);
   const [query, setQueryInput] = useState(""); const [brand, setBrand] = useState("all"); const [sort, setSort] = useState("newest"); const [maxPrice, setMaxPrice] = useState(priceMax); const [inStockOnly, setInStockOnly] = useState(false); const [filters, setFilters] = useState(false); const [activeCategory, setActiveCategory] = useState(params.get("category") || "");
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
-  // Scroll-linked banner: text and visual drift at different rates (parallax
-  // depth) and the visual zooms slightly as the hero leaves — a "camera pull".
-  // Gated on reduced-motion so the whole thing sits still for those users.
-  const heroRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const bannerY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 80]);
-  const bannerScale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.06]);
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -36]);
   // One request builds the set of already-saved product IDs so hearts render filled.
   // A 401 (signed-out visitor) just leaves the set empty; clicking a heart then routes to /account.
   useEffect(() => { let alive = true; fetch("/api/customer/wishlist", { credentials: "include" }).then((r) => (r.ok ? r.json() : null)).then((d) => { if (alive && d?.items) setWishlistIds(new Set(d.items.map((i: { productId: string }) => i.productId))); }).catch(() => {}); return () => { alive = false; }; }, []);
@@ -38,37 +28,30 @@ export default function ShopCatalog({ products }: { products: CatalogProduct[] }
 
   return (
     <div className="cinematic-scene relative isolate overflow-x-clip">
-      {/* One ambient wash for the whole catalogue — the emerald arrival (Phase 6) settles onto this. */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[78vh] bg-aurora opacity-80" />
+      {/* One continuous atmosphere for the ENTIRE page. A soft brand-blue glow settles
+          high (behind the hero) and melts smoothly into the dark base — no hard edge, no
+          band, no bottom-anchored radial, no height cap. Full-page (inset-0), so the whole
+          catalogue (hero → grid → footer) reads as a single cinematic dark-navy space.
+          Depth here is pure soft radial light layered on the .cinematic-scene base — never
+          a colour block. (The old wash was capped at h-[78vh] with a blue radial anchored
+          on its bottom edge, which cut the page into a brighter upper and darker lower half
+          right where the hero ends — that is the seam this replaces.) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(75% 55% at 22% 10%, rgb(37 99 235 / 0.16), transparent 60%), radial-gradient(65% 48% at 82% 16%, rgb(56 189 248 / 0.08), transparent 60%)",
+        }}
+      />
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.12]" />
 
-      {/* Hero */}
-      <section ref={heroRef} className="relative isolate overflow-hidden">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-2 md:items-center md:py-28">
-          <motion.div variants={staggerContainer} initial="hidden" animate="show" style={{ y: copyY }}>
-            <motion.p variants={lineChild} className="text-xs font-bold uppercase tracking-[.28em] text-accent-300">The CoverCraft edit · 2026</motion.p>
-            <motion.h1 variants={lineChild} className="mt-5 font-display text-4xl font-black leading-[1.02] tracking-cinema text-white sm:text-6xl">Made to protect.<br /><span className="text-gradient">Designed to be seen.</span></motion.h1>
-            <motion.p variants={lineChild} className="mt-6 max-w-lg leading-7 text-slate-300">Premium mobile covers for the device you carry everywhere. Find a signature look without compromising protection.</motion.p>
-            <motion.a variants={lineChild} href="#catalogue" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }} transition={{ duration: DUR.micro, ease: EASE_OUT_EXPO }} className="group mt-9 inline-flex items-center rounded-full bg-white px-7 py-3.5 text-sm font-bold text-ink-950 shadow-glow">Shop the collection<span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span></motion.a>
-          </motion.div>
-          <motion.div style={{ y: bannerY, scale: bannerScale }} className="relative mx-auto h-72 w-72 will-cinema sm:h-80 sm:w-80">
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: DUR_CINEMA.entrance, ease: EASE_CINEMATIC, delay: 0.18 }} className="absolute inset-0">
-              <div className="absolute inset-6 rotate-6 rounded-[2.8rem] bg-gradient-to-br from-accent-500 to-accent-700 opacity-90 blur-[2px]" />
-              <div className="glow-ring absolute inset-0 -rotate-6 overflow-hidden rounded-[2.8rem] border border-white/15 bg-ink-800 p-3">
-                {/* slow "breathing" zoom on the artwork itself */}
-                <motion.div animate={reduce ? undefined : { scale: [1, 1.06, 1] }} transition={{ duration: 9, ease: "easeInOut", repeat: Infinity }} className="h-full rounded-[2.3rem] bg-[radial-gradient(circle_at_30%_20%,#67e8f9,transparent_24%),linear-gradient(145deg,#0e1424,#1d4ed8_50%,#0b0f1e)]" />
-                {/* specular light sweeping across the glass */}
-                <motion.div aria-hidden animate={reduce ? undefined : { x: ["-160%", "260%"] }} transition={{ duration: 5, ease: "easeInOut", repeat: Infinity, repeatDelay: 2 }} className="pointer-events-none absolute inset-y-0 left-0 w-2/5 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-              </div>
-              <motion.span initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: DUR.base, ease: EASE_OUT_EXPO, delay: 0.6 }} className="absolute -right-6 top-12 rounded-full bg-accent-500 px-4 py-2 text-xs font-black text-white shadow-lg">UP TO 20% OFF</motion.span>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero — realistic WebGL phone on a dock stand, wrapped by an animated ring. */}
+      <ShopHero />
 
       {/* Shop by category — derived from the live catalogue so every tile filters. */}
       {categories.length > 0 && (
-        <section className="border-t border-white/5 px-6 py-16">
+        <section className="px-6 py-16">
           <div className="mx-auto max-w-7xl">
             <p className="text-xs font-bold uppercase tracking-[.24em] text-accent-300">Shop by category</p>
             <div className="mb-8 flex items-end justify-between">
@@ -94,7 +77,7 @@ export default function ShopCatalog({ products }: { products: CatalogProduct[] }
       )}
 
       {/* Catalogue: search / filters / grid */}
-      <section id="catalogue" className="scroll-mt-20 border-t border-white/5 py-16">
+      <section id="catalogue" className="scroll-mt-20 py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>

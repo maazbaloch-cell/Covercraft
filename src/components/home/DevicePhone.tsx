@@ -29,7 +29,7 @@ import { resolveProductImage } from "@/lib/productImage";
 const CAMERA_BOX = "left-[7%] top-[4.2%] h-[32%] w-[39%]";
 const CAMERA_RADIUS = "rounded-[28%]";
 
-export type PhoneSkin = "cover" | "art" | "gaming" | "sports";
+export type PhoneSkin = "cover" | "navy" | "art" | "gaming" | "sports";
 
 /* ------------------------------------------------------------------ *
  * Titanium chassis. Children stack inside the inset "screen well".
@@ -241,6 +241,23 @@ function CaseMaterial({ variant }: { variant: PhoneSkin }) {
         />
         {/* warm rim light on the right edge */}
         <div aria-hidden className="absolute inset-0" style={{ backgroundImage: "linear-gradient(255deg, rgba(255,210,150,0.5), transparent 30%)" }} />
+      </div>
+    );
+  }
+
+  if (variant === "navy") {
+    // Premium NEUTRAL case — deep navy/black, glassy, with brand-blue studio
+    // reflections and a soft-white sheen. The reusable, on-brand product finish.
+    return (
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: "radial-gradient(120% 100% at 30% 18%, #1c2e4d 0%, #13223d 40%, #0a1424 74%, #060c17 100%)" }}
+        />
+        {/* subtle brand-blue reflection (studio softbox) */}
+        <div aria-hidden className="absolute inset-0 opacity-80" style={{ backgroundImage: "radial-gradient(58% 42% at 72% 20%, rgba(59,130,246,0.35), transparent 62%)" }} />
+        {/* soft-white top-left sheen */}
+        <div aria-hidden className="absolute inset-0" style={{ backgroundImage: "linear-gradient(150deg, rgba(255,255,255,0.16), transparent 34%)" }} />
       </div>
     );
   }

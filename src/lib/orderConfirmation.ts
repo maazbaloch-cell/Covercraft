@@ -3,22 +3,43 @@ import { sendAdminOrderNotification, sendCustomerOrderConfirmation } from "@/lib
 import { notifyAdminNewOrder } from "@/lib/whatsapp";
 
 // Call this the moment a payment is confirmed, regardless of which gateway processed it.
+//
+// The transition to PAID is claimed atomically so this is safe under duplicate gateway
+// callbacks and races with the release cron. Only UNPAID or FAILED orders may become PAID:
+//  - UNPAID -> stock was reserved at checkout and stays reserved (normal path).
+//  - FAILED -> a late but valid payment for an order the release-cron or a failed callback
+//              had already failed and whose reserved stock was returned; re-reserve it so
+//              inventory stays truthful.
+// PAID (idempotent), REFUNDED (already refunded), and CANCELLED (buyer cancelled) are left
+// untouched — a duplicate or late callback must never resurrect them; the notifications also
+// fire only on the first successful claim, so no duplicate confirmation emails are sent.
 export async function markOrderPaidAndNotify(orderId: string) {
-  const existing = await prisma.order.findUnique({ where: { id: orderId }, select: { paymentStatus: true } });
-  if (!existing) throw new Error("Order not found");
-  if (existing.paymentStatus === "PAID") return prisma.order.findUniqueOrThrow({ where: { id: orderId } });
+  const order = await prisma.$transaction(async (tx) => {
+    const current = await tx.order.findUnique({ where: { id: orderId }, select: { paymentStatus: true } });
+    if (!current) throw new Error("Order not found");
 
-  const order = await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      paymentStatus: "PAID",
-      status: "CONFIRMED",
-      trackingHistory: {
-        create: { status: "CONFIRMED", note: "Payment received, order confirmed" },
-      },
-    },
-    include: { items: { include: { product: true, customDesign: true } } },
+    const claimed = await tx.order.updateMany({
+      where: { id: orderId, paymentStatus: { in: ["UNPAID", "FAILED"] }, status: { not: "CANCELLED" } },
+      data: { paymentStatus: "PAID", status: "CONFIRMED" },
+    });
+    if (claimed.count !== 1) return null; // already PAID/REFUNDED/CANCELLED, or lost the race
+
+    if (current.paymentStatus === "FAILED") {
+      const items = await tx.orderItem.findMany({ where: { orderId, productType: "STANDARD", productId: { not: null } } });
+      for (const item of items) {
+        if (item.productId) await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } });
+      }
+    }
+
+    await tx.trackingEvent.create({ data: { orderId, status: "CONFIRMED", note: "Payment received, order confirmed" } });
+    return tx.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: { items: { include: { product: true, customDesign: true } } },
+    });
   });
+
+  // Not claimed => already confirmed/refunded/cancelled: return current state without re-notifying.
+  if (!order) return prisma.order.findUniqueOrThrow({ where: { id: orderId } });
 
   const emailData = {
     orderNumber: order.orderNumber,
